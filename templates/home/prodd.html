@@ -1,0 +1,132 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+    <script src="{% static 'cart.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'prodd.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="/" class="logo">@thediynight</a>
+            <nav class="nav">
+                <a href="/" class="nav-item">Shop</a>
+                <a href="/track" class="nav-item">Track</a>
+                <a href="/user" class="nav-item">User</a>
+                <div class="cart-icon">
+                    <button class="nav-item" id="cart-btn">Cart</button>
+                    <span class="cart-count" id="cart-count">0</span>
+                </div>
+            </nav>
+        </header>
+        <main class="main-content">
+            <section class="product-container">
+                <div class="product-images">
+                    <img src="{{ product.product_images.first.image.url }}" alt="{{ product.product_name }}" class="product-image" id="main-image">
+                    {% for image in product.product_images.all|slice:"1:4" %}
+                        <img src="{{ image.image.url }}" alt="{{ product.product_name }}" class="additional-image" onclick="changeMainImage(this.src)">
+                    {% endfor %}
+                </div>
+                <div class="product-info">
+                    <h1 class="product-name">{{ product.product_name }}</h1>
+                    <p class="product-price" id="product-price">Rs. {{ product.price }}</p>
+                    <p class="product-description">{{ product.product_description }}</p>
+                    <div class="product-options">
+                        <div>
+                            <p class="option-label">Color:</p>
+                            {% for color_variant in product.color_variants.all %}
+                                <button class="color-option" data-color="{{ color_variant.color_name }}" data-price="{{ color_variant.price }}" onclick="selectColor(this)">{{ color_variant.color_name }}</button>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <p class="option-label">Size:</p>
+                            {% for size_variant in product.size_variants.all %}
+                                <button class="size-option" data-size="{{ size_variant.size_name }}" data-price="{{ size_variant.price }}" onclick="selectSize(this)">{{ size_variant.size_name }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="quantity-button" onclick="decreaseQuantity()">-</button>
+                        <span class="quantity-display" id="quantity-display">1</span>
+                        <button class="quantity-button" onclick="increaseQuantity()">+</button>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart('{{ product.product_name }}', {{ product.price }}, parseInt(document.getElementById('quantity-display').textContent))">
+                        Add to Cart
+                    </button>
+                </div>
+            </section>
+            <section class="related-products">
+                <h2>Related Products</h2>
+                <div class="similar-products-container">
+                    {% for similar_product in similar_products %}
+                        <a href="{% url 'prodd' similar_product.slug %}" class="product-card-link">
+                            <article class="product-card">
+                                <img src="{{ similar_product.product_images.first.image.url }}" alt="{{ similar_product.product_name }}" class="product-image-small">
+                                <div class="product-card-info">
+                                    <h3 class="product-name-small">{{ similar_product.product_name }}</h3>
+                                    <p class="product-price-small">Rs. {{ similar_product.price }}</p>
+                                    <div class="product-details">
+                                        <div class="product-rating">
+                                            <span class="rating-icon">★★★★☆</span>
+                                            <span>4.2</span>
+                                        </div>
+                                        <span class="cart-icon-small" onclick="addRelatedToCart({{ similar_product.id }})">🛒</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+            <section class="review-section">
+                <h2>Customer Reviews</h2>
+                <form class="review-form" id="reviewForm" method="post" enctype="multipart/form-data" action="{% url 'submit_review' %}">
+                    {% csrf_token %}
+                    <div class="star-rating">
+                        <input type="radio" id="star1" name="rating" value="1" />
+                        <label for="star1">★</label>
+                        <input type="radio" id="star2" name="rating" value="2" />
+                        <label for="star2">★</label>
+                        <input type="radio" id="star3" name="rating" value="3" />
+                        <label for="star3">★</label>
+                        <input type="radio" id="star4" name="rating" value="4" />
+                        <label for="star4">★</label>
+                        <input type="radio" id="star5" name="rating" value="5" />
+                        <label for="star5">★</label>
+                    </div>
+                    <textarea class="review-input" id="reviewText" name="text" placeholder="Write your review here..." rows="4"></textarea>
+                    <input type="file" id="reviewMedia" name="media" accept="image/*,video/*" />
+                    <input type="hidden" id="productUid" name="product_uid" value="{{ product.uid }}" />
+                    <button class="review-submit" type="submit">Submit Review</button>
+                </form>
+                
+                
+                <div class="reviews-list" id="reviewsList"></div>
+                <div class="review-preview" id="reviewPreview">
+                    <h3>Your Review Preview</h3>
+                    <div class="preview-rating" id="previewRating"></div>
+                    <p class="preview-text" id="previewText"></p>
+                    <div class="preview-media" id="previewMedia"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+ <!-- Cart Modal -->
+<div id="cartModal" class="cart-modal">
+    <div class="cart-modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Your Cart</h2>
+        <div id="cart-items"></div>
+        <p id="cart-total">Rs.0.00</p>
+        <button class="cart-checkout">Checkout</button>
+    </div>
+</div>
+
+  
+        
+</body>
+
+</html>

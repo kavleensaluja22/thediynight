@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Categories</title>
+    <style>
+        /* Place your CSS here */
+        .category-title {
+          font-size: 20px;
+          color: #fff;
+          margin-bottom: 15px;
+        }
+        .category-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+        }
+        .category-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-decoration: none;
+          color: #333;
+          transition: transform 0.3s ease;
+        }
+        .category-item:hover {
+          transform: translateY(-5px);
+        }
+        .category-icon {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background-size: cover;
+          background-position: center;
+          margin-bottom: 10px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .category-name {
+          font-size: 14px;
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <section class="category-section">
+      <h2 class="category-title">BROWSE CATEGORIES</h2>
+      <div class="category-grid">
+          {% for category in categories %}
+          <a href="{% url 'category_detail' category.slug %}" class="category-item">
+              <div class="category-icon" style="background-image: url('{{ category.category_image.url }}');"></div>
+              <span class="category-name">{{ category.category_name }}</span>
+          </a>
+          {% endfor %}
+      </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,695 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The DIY Night</title>
+<link href="http://b.io/ext_4-" rel="stylesheet">
+<script src="{% static 'cart.js' %}"></script>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+}
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #6daabd;
+    text-decoration: none;
+}
+
+.nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-item {
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px 15px;
+    border-radius: 5px;
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    color: #6daabd;
+    background-color: #f0f0f0;
+}
+
+.cart-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff6b6b;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.main-content {
+    background-color: #6daabd;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.search-bar {
+    display: flex;
+    margin-bottom: 30px;
+}
+.search-input {
+    flex-grow: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px 0 0 25px;
+    font-size: 16px;
+}
+.search-button {
+    padding: 12px 25px;
+    background-color: #fdfdfd;
+    border: none;
+    border-radius: 0 25px 25px 0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+.search-button:hover {
+    background-color: #e0e0e0;
+}
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+.product-card {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.product-image {
+    background-color: #f0f0f0;
+    height: 140px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+.product-name {
+    font-style: italic;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.product-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+.product-price {
+    font-weight: bold;
+    font-size: 16px;
+}
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.rating-stars {
+    display: inline-block;
+    font-size: 16px;
+    color: #ffd700;
+    cursor: pointer;
+}
+.add-to-cart {
+    background-color: #6daabd;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    width: 100%;
+}
+.add-to-cart:hover {
+    background-color: #5a91a1;
+}
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+.quantity-btn {
+    background-color: #f0f0f0;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.quantity-btn:hover {
+    background-color: #e0e0e0;
+}
+.quantity {
+    font-size: 16px;
+}
+.slogan {
+    background-color: #fffdfd;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    font-style: italic;
+    margin: 30px 0;
+    font-size: 20px;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.cart-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.cart-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+}
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.close-cart {
+    font-size: 24px;
+    cursor: pointer;
+}
+.cart-items {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.cart-item-details {
+    flex-grow: 1;
+}
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.cart-quantity-btn {
+    background-color: #f0f0f0;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.cart-quantity-btn:hover {
+    background-color: #e0e0e0;
+}
+.cart-item-remove {
+    background-color: #ff6b6b;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.cart-item-remove:hover {
+    background-color: #ff5252;
+}
+.cart-total {
+    margin-top: 20px;
+    text-align: right;
+    font-weight: bold;
+}
+.checkout-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #6daabd;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+.checkout-btn:hover {
+    background-color: #5a91a1;
+}
+.category-section {
+    margin-top: 50px;
+}
+.category-title {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 20px;
+}
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.3s ease;
+}
+.category-item:hover {
+    transform: translateY(-5px);
+}
+.category-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.category-name {
+    font-size: 16px;
+    text-align: center;
+}
+.track-section {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    margin-top: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.track-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+.track-form {
+    display: flex;
+    gap: 15px;
+}
+.track-input {
+    flex-grow: 1;
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.track-button {
+    padding: 12px 25px;
+    background-color: #6daabd;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+.track-button:hover {
+    background-color: #5a91a1;
+}
+.track-result {
+    margin-top: 30px;
+    display: none;
+}
+.track-status {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+.track-details {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+}
+.track-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.track-item:last-child {
+    border-bottom: none;
+}
+.order-history-section {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 30px;
+    margin-top: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.order-history-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+.order-history-list {
+    list-style-type: none;
+    padding: 0;
+}
+.order-history-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+.order-history-item:last-child {
+    border-bottom: none;
+}
+.order-number {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.order-date {
+    color: #666;
+    font-size: 14px;
+}
+.order-total {
+    font-weight: bold;
+    color: #6daabd;
+}
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav {
+        margin-top: 15px;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .category-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    }
+    .track-form {
+        flex-direction: column;
+    }
+    .track-button {
+        width: 100%;
+    }
+}
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    .header {
+        padding: 15px;
+    }
+    .logo {
+        font-size: 24px;
+    }
+    .nav {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .nav-item {
+        font-size: 16px;
+        padding: 8px 12px;
+    }
+    .main-content {
+        padding: 20px;
+    }
+    .search-input, .search-button {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    .product-card {
+        padding: 15px;
+    }
+    .product-image {
+        height: 140px;
+    }
+    .product-name {
+        font-size: 16px;
+    }
+    .product-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .product-price {
+        margin-bottom: 5px;
+    }
+    .add-to-cart {
+        margin-top: 10px;
+    }
+    .slogan {
+        font-size: 18px;
+        padding: 20px;
+    }
+    .category-title {
+        font-size: 20px;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    .category-icon {
+        width: 80px;
+        height: 80px;
+    }
+    .category-name {
+        font-size: 14px;
+    }
+    .track-title {
+        font-size: 20px;
+    }
+    .track-input, .track-button {
+        font-size: 14px;
+    }
+    .track-status {
+        font-size: 16px;
+    }
+    .track-item {
+        flex-direction: column;
+    }
+    .order-history-title {
+        font-size: 20px;
+    }
+    .order-history-item {
+        padding: 10px 0;
+    }
+    .order-number {
+        font-size: 14px;
+    }
+    .order-date, .order-total {
+        font-size: 12px;
+    }
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="/" class="logo">@thediynight</a>
+            <nav class="nav">
+                <a href="/" class="nav-item">Shop</a>
+                <a href="track" class="nav-item">Track</a>
+                <a href="user" class="nav-item">User</a>
+                <div class="cart-icon">
+                    <button class="nav-item" id="cart-btn">Cart</button>
+                    <span class="cart-count">0</span>
+                </div>
+            </nav>
+        </header>
+        <main class="main-content">
+            <div class="slogan">Crafted with Care, Shaping Stories</div>
+            <section class="track-section">
+                <h2 class="track-title">Track Your Order</h2>
+                <form class="track-form" id="track-form">
+                    <input type="text" class="track-input" placeholder="Enter your order number" required>
+                    <button type="submit" class="track-button">Track</button>
+                </form>
+                <div class="track-result" id="track-result">
+                    <p class="track-status">Order Status: <span id="order-status"></span></p>
+                    <div class="track-details" id="track-details"></div>
+                </div>
+            </section>
+            <section class="order-history-section">
+                <h2 class="order-history-title">Previous Order History</h2>
+                <ul class="order-history-list" id="order-history-list"></ul>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="cart-modal" style="display: none;">
+        <div class="cart-content">
+            <span id="close-cart" class="close">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cart-items" class="cart-items"></div>
+            <div id="cart-total" class="cart-total">Total: $0.00</div>
+            <button id="checkout-btn" class="checkout-btn">Checkout</button>
+        </div>
+    </div>
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cartBtn = document.getElementById("cart-btn");
+            const cartModal = document.getElementById("cart-modal");
+            const closeCart = document.getElementById("close-cart");
+            const cartItems = document.getElementById("cart-items");
+            const cartTotal = document.getElementById("cart-total");
+            
+            // Load cart from local storage
+            let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        
+            // Open Cart Modal
+            cartBtn.addEventListener("click", () => {
+                cartModal.style.display = "block";
+                updateCartDisplay();
+            });
+        
+            // Close Cart Modal
+            closeCart.addEventListener("click", () => {
+                cartModal.style.display = "none";
+            });
+        
+            // Close Cart Modal when clicking outside of the modal
+            window.addEventListener("click", (event) => {
+                if (event.target === cartModal) {
+                    cartModal.style.display = "none";
+                }
+            });
+        
+            // Function to update the cart display
+            function updateCartDisplay() {
+                cartItems.innerHTML = "";
+                let total = 0;
+        
+                for (const [product, details] of Object.entries(cart)) {
+                    const itemTotal = details.quantity * details.price;
+                    total += itemTotal;
+        
+                    const cartItem = document.createElement("div");
+                    cartItem.classList.add("cart-item");
+                    cartItem.innerHTML = `
+                        <div class="cart-item-details">
+                            <h3>${product}</h3>
+                            <p>Price: Rs.${details.price.toFixed(2)}</p>
+                            <p>Quantity: ${details.quantity}</p>
+                            <p>Total: Rs.${itemTotal.toFixed(2)}</p>
+                        </div>
+                        <button class="cart-item-remove" data-product="${product}">Remove</button>
+                    `;
+                    cartItems.appendChild(cartItem);
+                }
+        
+                cartTotal.textContent = `Total: Rs.${total.toFixed(2)}`;
+            }
+        
+            // Remove item from cart
+            cartItems.addEventListener("click", (event) => {
+                if (event.target.classList.contains("cart-item-remove")) {
+                    const product = event.target.dataset.product;
+                    delete cart[product];
+                    saveCart();
+                    updateCartDisplay();
+                }
+            });
+        
+            // Function to save the cart to local storage
+            function saveCart() {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+        
+            // Initial cart update
+            updateCartDisplay();
+        });
+        </script>
+        
+    
+    </body>
+</html>    

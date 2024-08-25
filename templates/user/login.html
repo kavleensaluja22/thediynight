@@ -1,0 +1,489 @@
+<div class="div">
+    <div class="div-2">
+      <div class="div-3">@thediynight</div>
+      <div class="div-4">
+        <div class="div-5">Shop</div>
+        <div class="div-6">Track</div>
+        <div class="div-7">Cart</div>
+        <div class="div-8">User</div>
+      </div>
+    </div>
+ 
+    <div class="line"></div>
+
+    <div class="div-12">
+      <div class="div-13">
+        <img
+          loading="lazy"
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/cbdab3df48a6ed83fbed770efe66791aef3b40d97e0756e4c369c3489f342a49?apiKey=f204040e98d84f33a858a3ebed299fa6&"
+          class="img"
+        />
+        <div class="div-14">LOG IN HERE !</div>
+        <form method="POST">
+          {% csrf_token%}
+          {% include "user/alert.html" %}
+        <div class="div-15">
+          <div class="div-16">
+            <div class="div-17">
+              <div class="div-18">E-MAIL ADDRESS</div>
+              <div class="div-19">
+                <input type="email" name="email" id="email" placeholder="name@gmail.com" style="border-radius: 12px; border: none; background-color: transparent; color: #fff; padding: 10px;">
+              </div>
+              <div class="div-20">PASSWORD</div>
+              <div class="div-21">
+                <input type="password" name="password" id="password" placeholder="password" style="border-radius: 12px; border: none; background-color: transparent; color: #fff; padding: 10px;">
+              </div>
+              <div class="div-22">Forget Password</div>
+              
+            </div>
+            <button class="div-23" style="background-color: white; color: black; border-radius: 12px; border: none; padding: 15px 30px; font-size: 20px; text-align: center;"> LOGIN </button>
+
+
+
+
+
+
+          </div>
+          <div class="div-25">
+            <div class="div-26"></div>
+            <div class="div-27">OR</div>
+            <div class="div-28"></div>
+          </div>
+          <div class="div-29">
+            <div class="div-30">
+              <img
+                loading="lazy"
+                src="https://cdn.builder.io/api/v1/image/assets/TEMP/eba940891f493b77431ec4dd17aa1f836c8c3c94495552ca32f000d0873e139b?apiKey=f204040e98d84f33a858a3ebed299fa6&"
+                class="img-3"
+              />
+              <div class="div-31">CONTINUE WITH GOOGLE</div>
+            </div>
+            <div class="div-32">
+              <img
+                loading="lazy"
+                src="https://cdn.builder.io/api/v1/image/assets/TEMP/74b00f07d57119f20600db41429a1f54e40fbb7010bd974fac777d7db9206619?apiKey=f204040e98d84f33a858a3ebed299fa6&"
+                class="img-4"
+              />
+              <div class="div-33">CONTINUE WITH APPLE</div>
+            </div>
+            <div class="div-34">
+              <img
+                loading="lazy"
+                src="https://cdn.builder.io/api/v1/image/assets/TEMP/1c00266ae103b0207d02306cb6aa9bf29bddf9ce85d9c251bae92586ba31d408?apiKey=f204040e98d84f33a858a3ebed299fa6&"
+                class="img-5"
+              />
+              <div class="div-35">CONTINUE WITH FACEBOOK</div>
+            </div>
+          </div>
+        </div>
+        <div class="div-36" style="text-align: center; font-size: 20px;">
+          Don’t Have An Account? <a href="/sign" style="color: black; text-decoration: none;">Sign Up</a>
+      </div>
+      
+      </div>
+    </div>
+  </form>
+  </div>
+  <style>
+    .div {
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      font-weight: 400;
+      padding: 8px 0 50px;
+    }
+    .div-2 {
+      display: flex;
+      width: 100%;
+      padding-right: 37px;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 18px;
+      color: #000;
+      white-space: nowrap;
+    }
+    @media (max-width: 991px) {
+      .div-2 {
+        max-width: 100%;
+        margin-right: 5px;
+        flex-wrap: wrap;
+        padding-right: 20px;
+        white-space: initial;
+      }
+    }
+    .div-3 {
+      font-family: Inter, sans-serif;
+      flex-grow: 1;
+      flex-basis: auto;
+    }
+    .div-4 {
+      align-self: start;
+      display: flex;
+      gap: 11px;
+    }
+    @media (max-width: 991px) {
+      .div-4 {
+        white-space: initial;
+      }
+    }
+    .div-5 {
+      font-family: Inter, sans-serif;
+      flex-grow: 1;
+    }
+    .div-6 {
+      font-family: Inter, sans-serif;
+    }
+    .div-7 {
+      font-family: Inter, sans-serif;
+    }
+    .div-8 {
+      font-family: Inter, sans-serif;
+      flex-grow: 1;
+    }
+    .div-9 {
+      background-color: #000;
+      width: 1275px;
+      max-width: 100%;
+      height: 4px;
+    }
+    @media (max-width: 991px) {
+      .div-9 {
+        margin-right: 5px;
+      }
+    }
+    .div-10 {
+      background-color: #000;
+      z-index: 10;
+      margin-top: -4px;
+      width: 1275px;
+      max-width: 100%;
+      height: 4px;
+    }
+    @media (max-width: 991px) {
+      .div-10 {
+        margin-right: 5px;
+      }
+    }
+    .div-11 {
+      background-color: #000;
+      z-index: 10;
+      margin-top: -4px;
+      width: 1275px;
+      max-width: 100%;
+      height: 4px;
+    }
+    @media (max-width: 991px) {
+      .div-11 {
+        margin-right: 5px;
+      }
+    }
+    .div-12 {
+      border-radius: 18px;
+      background-color: rgba(86, 136, 139, 1);
+      align-self: center;
+      display: flex;
+      margin-top: 17px;
+      width: 100%;
+      max-width: 1188px;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      padding: 30px 60px;
+    }
+    @media (max-width: 991px) {
+      .div-12 {
+        max-width: 100%;
+        padding: 0 20px;
+      }
+    }
+    .div-13 {
+      display: flex;
+      margin-bottom: 10px;
+      width: 486px;
+      max-width: 100%;
+      flex-direction: column;
+      align-items: center;
+    }
+    .img {
+      aspect-ratio: 1.54;
+      object-fit: auto;
+      object-position: center;
+      width: 262px;
+      fill: url(<path-to-image>), lightgray 50% / cover no-repeat;
+      filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+      max-width: 100%;
+    }
+    .div-14 {
+      color: #fff;
+      margin-top: 57px;
+      font: 24px Inter, sans-serif;
+    }
+    @media (max-width: 991px) {
+      .div-14 {
+        margin-top: 40px;
+      }
+    }
+    .div-15 {
+      align-self: stretch;
+      display: flex;
+      margin-top: 40px;
+      align-items: start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    @media (max-width: 991px) {
+      .div-15 {
+        max-width: 100%;
+        flex-wrap: wrap;
+      }
+    }
+    .div-16 {
+      display: flex;
+      margin-top: 20px;
+      flex-grow: 1;
+      flex-basis: 0%;
+      flex-direction: column;
+    }
+    .div-17 {
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      white-space: nowrap;
+      padding: 0 27px 0 10px;
+    }
+    @media (max-width: 991px) {
+      .div-17 {
+        padding-right: 20px;
+        white-space: initial;
+      }
+    }
+    .div-18 {
+      font-family: Inter, sans-serif;
+    }
+    @media (max-width: 991px) {
+      .div-18 {
+        white-space: initial;
+      }
+    }
+    .div-19 {
+      font-family: Inter, sans-serif;
+      margin-top: 18px;
+    }
+    .div-20 {
+      font-family: Inter, sans-serif;
+      margin-top: 32px;
+    }
+    .div-21 {
+      font-family: Inter, sans-serif;
+      margin-top: 12px;
+    }
+    .div-22 {
+      color: #401818;
+      font-family: Inter, sans-serif;
+      margin-top: 29px;
+    }
+    @media (max-width: 991px) {
+      .div-22 {
+        white-space: initial;
+      }
+    }
+    .div-23 {
+      disply: flex;
+      flex-direction: column;
+      font-family: Inter, sans-serif;
+      position: relative;
+      fill: #fef5f5;
+      stroke-width: 1px;
+      stroke: #fffefe;
+      overflow: hidden;
+      align-self: center;
+      aspect-ratio: 5.04;
+      margin-top: 48px;
+      justify-content: center;
+      color: #0d0c0c;
+      padding: 9px 42px;
+    }
+    @media (max-width: 991px) {
+      .div-23 {
+        margin-top: 40px;
+        padding: 0 20px;
+      }
+    }
+    .img-2 {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .div-24 {
+      position: relative;
+    }
+    .div-25 {
+      display: flex;
+      flex-basis: 0%;
+      flex-direction: column;
+      color: #fff;
+      white-space: nowrap;
+    }
+    @media (max-width: 991px) {
+      .div-25 {
+        display: none;
+        white-space: initial;
+      }
+    }
+    .div-26 {
+      background-color: #fff;
+      height: 102px;
+    }
+    .div-27 {
+      font-family: Inter, sans-serif;
+      margin-top: 8px;
+    }
+    .div-28 {
+      background-color: #fff;
+      margin-top: 5px;
+      height: 106px;
+    }
+    .div-29 {
+      display: flex;
+      margin-top: 8px;
+      flex-grow: 1;
+      flex-basis: 0%;
+      flex-direction: column;
+      color: #fff;
+    }
+    .div-30 {
+      border: 1px solid #fdfdfd;
+      display: flex;
+      justify-content: space-between;
+      gap: 11px;
+      white-space: nowrap;
+      padding: 9px 11px 15px;
+    }
+    @media (max-width: 991px) {
+      .div-30 {
+        white-space: initial;
+      }
+    }
+    .img-3 {
+      aspect-ratio: 1.2;
+      object-fit: auto;
+      object-position: center;
+      width: 29px;
+      fill: #fff;
+    }
+    .div-31 {
+      font-family: Inter, sans-serif;
+      flex-grow: 1;
+      margin: auto 0;
+    }
+    @media (max-width: 991px) {
+      .div-31 {
+        white-space: initial;
+      }
+    }
+    .div-32 {
+      border: 1px solid #fffefe;
+      display: flex;
+      margin-top: 29px;
+      justify-content: space-between;
+      gap: 11px;
+      color: #f9f7f7;
+      white-space: nowrap;
+      padding: 9px 18px 17px;
+    }
+    @media (max-width: 991px) {
+      .div-32 {
+        white-space: initial;
+      }
+    }
+    .img-4 {
+      aspect-ratio: 1;
+      object-fit: auto;
+      object-position: center;
+      width: 22px;
+      fill: #fffbfb;
+    }
+    .div-33 {
+      font-family: Inter, sans-serif;
+      align-self: start;
+      margin-top: 10px;
+      flex-grow: 1;
+    }
+    @media (max-width: 991px) {
+      .div-33 {
+        white-space: initial;
+      }
+    }
+    .div-34 {
+      border: 1px solid rgba(254, 254, 254, 1);
+      display: flex;
+      margin-top: 36px;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 8px 14px 15px;
+    }
+    .img-5 {
+      aspect-ratio: 0.64;
+      object-fit: auto;
+      object-position: center;
+      width: 16px;
+      fill: #fffdfd;
+    }
+    .div-35 {
+      font-family: Inter, sans-serif;
+      flex-grow: 1;
+      flex-basis: auto;
+      margin: auto 0;
+    }
+    .div-36 {
+      font-family: Inter, sans-serif;
+      border-radius: 14px;
+      border: 1px solid #fbf6f6;
+      background-color: #fcf5f5;
+      margin-top: 27px;
+      width: 305px;
+      max-width: 100%;
+      justify-content: center;
+      align-items: start;
+      color: #000;
+      white-space: nowrap;
+      padding: 7px 56px;
+    }
+    @media (max-width: 991px) {
+      .div-36 {
+        white-space: initial;
+        padding: 0 20px 0 28px;
+      }
+    }
+    .div-11 {
+        background-color: #000;
+        margin-top: 8px;
+        height: 3px;
+      }
+      @media (max-width: 991px) {
+        .div-11 {
+          max-width: 100%;
+        }
+      }
+      .line {
+        height: 3px;
+        margin-top: 6px;
+        background-color: black; /* Change the color as needed */
+        width: 100%;
+      }
+
+      .div-19 input::placeholder,
+  .div-21 input::placeholder {
+    color: #fff; /* Set placeholder color to white */
+   
+  }
+  .div-19 input:focus,
+  .div-21 input:focus {
+    outline: none; /* Remove the outline when input is focused */
+  }
+
+  </style>
+  

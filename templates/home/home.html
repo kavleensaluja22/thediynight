@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The DIY Night</title>
+    <script src="{% static 'cart.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="/" class="logo">@thediynight</a>
+            <nav class="nav">
+                <a href="/" class="nav-item">Shop</a>
+                <a href="/track" class="nav-item">Track</a>
+                <a href="/user" class="nav-item">User</a>
+                <div class="cart-icon">
+                    <button class="nav-item" id="cart-btn">Cart</button>
+                    <span class="cart-count" id="cart-count">0</span>
+                </div>
+            </nav>
+        </header>
+        <main class="main-content">
+            <form class="search-bar">
+                <input type="text" class="search-input" placeholder="Search products" aria-label="Search products">
+                <button type="submit" class="search-button" aria-label="Submit search">Search</button>
+            </form>
+            <section class="category-section">
+                <h2 class="category-title">Browse Categories</h2>
+                <div class="category-grid">
+                    {% for category in categories %}
+                    <a href="{% url 'category_detail' category.slug %}" class="category-item">
+                        <div class="category-icon" style="background-image: url('{% if category.category_image %}{{ category.category_image.url }}{% else %}/path/to/default/image.jpg{% endif %}');"></div>
+                        <span class="category-name">{{ category.category_name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            <div class="product-grid" id="product-grid">
+                {% for product in products %}
+                <article class="product-card">
+                    <div class="product-image">
+                        <a href="{% url 'prodd' product.slug %}">
+                            {% if product.product_images.all %}
+                            <img src="{{ product.product_images.first.image.url }}" alt="{{ product.product_name }}">
+                            {% else %}
+                            <img src="/path/to/default/image.jpg" alt="Default Image">
+                            {% endif %}
+                        </a>
+                    </div>
+                    <h3 class="product-name">{{ product.product_name }}</h3>
+                    <div class="product-details">
+                        <span class="product-price">Rs.{{ product.price }}</span>
+                        <div class="product-rating">
+                            <span class="rating-stars" data-rating="4.5" data-product="{{ product.product_name }}">★★★★☆</span>
+                            <span class="rating-value">4.5</span>
+                        </div>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="quantity-btn minus" data-product="{{ product.product_name }}">-</button>
+                        <span class="quantity" data-product="{{ product.product_name }}">0</span>
+                        <button class="quantity-btn plus" data-product="{{ product.product_name }}">+</button>
+                    </div>
+                    <button class="add-to-cart" onclick="addToCart('{{ product.product_name }}', {{ product.price }}, parseInt(document.querySelector('span[data-product=\'{{ product.product_name }}\']').textContent))">
+                        Add to Cart
+                    </button>
+                </article>
+                {% endfor %}
+            </div>
+        </main>
+        <div class="slogan">
+            Unleash your creativity with The DIY Night!
+        </div>
+    </div>
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-modal-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="close-modal" id="close-cart">&times;</button>
+            </div>
+            <div class="cart-items" id="cart-items"></div>
+            <div class="cart-total">Total: <span id="cart-total">Rs.0</span></div>
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+</body>
+</html>

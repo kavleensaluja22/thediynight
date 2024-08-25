@@ -1,0 +1,208 @@
+<div class="div">
+  <div class="div-2">
+    <div class="div-3">@thediynight</div>
+    <div class="div-4">
+      <div class="div-5">Shop</div>
+      <div class="div-6">Track</div>
+      <div class="div-7">Cart</div>
+      <div class="div-8">User</div>
+    </div>
+  </div>
+  <div class="line"></div>
+  <div class="div-10">
+    <div class="div-10">
+      <div class="div-11">Sign up Here</div>
+      <form method="POST">
+        {% csrf_token %}
+        {% include "user/alert.html" %}
+        <div class="input-group">
+          <div class="div-12 input-container">
+            <input type="text" id="first_name" name="first_name" required placeholder="First Name">
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="div-13 input-container">
+            <input type="text" id="last_name" name="last_name" required placeholder="Last Name">
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="div-15 input-container">
+            <input type="email" id="email" name="email" required placeholder="E-mail">
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="div-15 input-container">
+            <input type="password" id="password" name="password" required placeholder="Password">
+          </div>
+        </div>
+        <button type="submit" class="div-17">Sign Up</button>
+      </form>
+      <div class="div-18" style="color: #fff;">ALREADY HAVE AN ACCOUNT? <a href="/user_login" style="color: #fff; text-decoration: none;">LOGIN HERE</a></div>
+
+
+    
+
+<style>
+  /* Common styles for all screen sizes */
+  .div {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    font-weight: 400;
+    padding: 19px 0 50px;
+  }
+  .div-2 {
+    display: flex;
+    width: 100%;
+    padding-right: 37px;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 18px;
+    color: #000;
+    white-space: nowrap;
+  }
+  @media (max-width: 991px) {
+    .div-2 {
+      max-width: 100%;
+      margin-right: 5px;
+      flex-wrap: wrap;
+      padding-right: 20px;
+      white-space: initial;
+    }
+  }
+  .div-3 {
+    font-family: Inter, sans-serif;
+    flex-grow: 1;
+    flex-basis: auto;
+  }
+  .div-4 {
+    align-self: start;
+    display: flex;
+    gap: 11px;
+  }
+  @media (max-width: 991px) {
+    .div-4 {
+      white-space: initial;
+    }
+  }
+  .div-5 {
+    font-family: Inter, sans-serif;
+    flex-grow: 1;
+  }
+  .div-6 {
+    font-family: Inter, sans-serif;
+  }
+  .div-7 {
+    font-family: Inter, sans-serif;
+  }
+  .div-8 {
+    font-family: Inter, sans-serif;
+    flex-grow: 1;
+  }
+  .div-9 {
+    background-color: #000;
+    width: 1275px;
+    max-width: 100%;
+    height: 4px;
+  }
+  @media (max-width: 991px) {
+    .div-9 {
+      margin-right: 5px;
+    }
+  }
+
+  .line {
+    height: 3px;
+    margin-top: 6px;
+    background-color: black; /* Change the color as needed */
+    width: 100%;
+  }
+  
+  .div-10 {
+    border-radius: 12px;
+    background-color: #56888b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 56px 30px; /* Reduced horizontal padding for mobile */
+    width: calc(50% - 30px); /* Full width with some margin */
+    margin: 20px 5px; /* Adjusted margin for mobile */
+    margin: 50px 0 0 40px; 
+  }
+  
+  .div-11 {
+    color: #fbf7f7;
+    font-size: 22px;
+    margin-bottom: 10px; /* Added margin for separation */
+    margin-left: -25px; 
+    
+  }
+  
+  .div-12, .div-13, .div-14,.div-15, .div-16 {
+    font-family: Inter, sans-serif;
+    border-radius: 12px;
+    background-color: #e3e3e3;
+    margin-top: 20px; /* Adjusted margin for mobile */
+    padding: 20px 20px; /* Reduced padding for mobile */
+    width: calc(140% - 40px); /* Full width with some margin */
+    box-sizing: border-box; /* Ensure padding is included in width */
+  }
+  
+  .div-14 {
+    height: 20px; /* Adjusted height for mobile */
+  }
+  
+  .div-17 {
+    border-radius: 12px;
+    background-color: #40a3ce;
+    color: #fff; /* Added text color for visibility */
+    margin-top: 20px; /* Adjusted margin for mobile */
+    padding: 12px 20px; /* Reduced padding for mobile */
+    width: calc(100% - 40px); /* Full width with some margin */
+    box-sizing: border-box; /* Ensure padding is included in width */
+  }
+  
+  .div-18 {
+    color: #fff; /* Keep link color white */
+    font-family: Inter, sans-serif;
+    margin-top: 20px; /* Adjusted margin for mobile */
+    margin-left: -20px;
+    white-space: nowrap;
+  }
+  
+  
+  /* Media query for screens smaller than 991px (e.g., mobile devices) */
+  @media (max-width: 991px) {
+    .div-2 {
+      flex-direction: column; /* Stack items vertically on small screens */
+      align-items: center; /* Center items horizontally on small screens */
+    }
+    
+    .div-10 {
+      margin-top: 20px; /* Adjusted margin for small screens */
+    }
+  }
+
+  .input-container {
+    width: 170%; /* Set the width to 170% */
+    border-radius: 12px; /* Apply border-radius */
+    background-color: #e3e3e3; /* Set background color */
+    padding: 10px 20px; /* Add padding horizontally */
+    margin-right: 40px; /* Adjust the margin to move the input box to the left */
+    margin-left: -40%;
+  }
+  
+  .input-container input {
+    width: calc(100% - 40px); /* Adjust the input width to account for padding */
+    border: none; /* Hide the input border */
+    outline: none; /* Remove outline */
+    background: transparent; /* Set background to transparent */
+  }
+  
+  .div-11 {
+    color: #fbf7f7;
+    font-size: 22px;
+    margin-top: -30px; /* Adjusted margin for shifting it upwards */
+  }
+  
+</style>
