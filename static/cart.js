@@ -1,250 +1,159 @@
-// Function to open the cart modal and display updated cart items
-function openCartModal() {
-    const cartModal = document.getElementById('cartModal');
-    if (cartModal) {
-        updateCartDisplay();  // Ensure cart is updated before displaying modal
-        cartModal.style.display = 'block';
+// Validate if a cart item is valid
+function isValidCartItem(item) {
+    return item && typeof item.quantity === 'number' && item.quantity > 0;
+}
+
+// Retrieve the current quantity for a product
+function getCurrentQuantity() {
+    const quantityDisplay = document.getElementById('quantity-display');
+    if (!quantityDisplay || isNaN(parseInt(quantityDisplay.textContent, 10))) {
+        console.error("Quantity display element is missing or not a valid number");
+        return 1; // Default to 1 if there's an issue
     }
+    return parseInt(quantityDisplay.textContent, 10);
 }
 
-// Function to close the cart modal
-function closeCartModal() {
-    const cartModal = document.getElementById('cartModal');
-    if (cartModal) {
-        cartModal.style.display = 'none';
-    }
-}
-
-// Initialize variables for selected color and size
-let selectedColor = localStorage.getItem('selectedColor') || '';
-let selectedSize = localStorage.getItem('selectedSize') || '';
-let cart = JSON.parse(localStorage.getItem('cart')) || {};
-
-// Function to select a color
-function selectColor(button) {
-    const colorButtons = document.querySelectorAll('button[data-color]');
-    colorButtons.forEach(btn => btn.classList.remove('selected')); // Remove previous selection
-    selectedColor = button.dataset.color;
-    localStorage.setItem('selectedColor', selectedColor);
-    button.classList.add('selected'); // Add selection to the current button
-    updatePrice();
-    console.log(`Color selected: ${selectedColor}`);
-}
-
-// Function to select a size
-function selectSize(button) {
-    const sizeButtons = document.querySelectorAll('button[data-size]');
-    sizeButtons.forEach(btn => btn.classList.remove('selected')); // Remove previous selection
-    selectedSize = button.dataset.size;
-    localStorage.setItem('selectedSize', selectedSize);
-    button.classList.add('selected'); // Add selection to the current button
-    updatePrice();
-    console.log(`Size selected: ${selectedSize}`);
-}
-
-// Function to update the price based on selected color and size
-function updatePrice() {
-    const priceDisplay = document.getElementById('product-price');
-    const basePriceElement = document.getElementById('base-price');
-
-    if (!priceDisplay || !basePriceElement) {
-        console.error('Price display or base price element not found');
+// Add item to the cart
+function addToCart(productName, price = 0) {
+    const quantity = getCurrentQuantity();
+    if (isNaN(quantity) || quantity <= 0) {
+        console.error("Invalid quantity for product:", quantity);
         return;
     }
 
-    const basePrice = parseFloat(basePriceElement.textContent.replace('Rs.', '').trim());
-    let additionalPrice = 0;
+    let cart = JSON.parse(localStorage.getItem('cart')) || {};
+    const cartKey = `${productName}|${price}`;
 
-    if (selectedColor) {
-        const colorButton = document.querySelector(`button[data-color="${selectedColor}"]`);
-        if (colorButton) {
-            additionalPrice += parseFloat(colorButton.dataset.price) || 0;
-        }
+    if (!cartKey || quantity <= 0) {
+        console.warn("Invalid cart item data:", { cartKey, quantity });
+        return;
     }
 
-    if (selectedSize) {
-        const sizeButton = document.querySelector(`button[data-size="${selectedSize}"]`);
-        if (sizeButton) {
-            additionalPrice += parseFloat(sizeButton.dataset.price) || 0;
-        }
-    }
-
-    const totalPrice = basePrice + additionalPrice;
-    priceDisplay.textContent = `Rs.${totalPrice.toFixed(2)}`;
-}
-
-// Function to initialize and update quantity display
-function updateQuantityDisplay() {
-    const quantitySpan = document.getElementById('quantity-display');
-    if (quantitySpan) {
-        const savedQuantity = localStorage.getItem('quantity') || '1';
-        quantitySpan.textContent = savedQuantity; // Load saved quantity or set default to 1
-    }
-}
-
-// Function to increase quantity
-function increaseQuantity() {
-    const quantitySpan = document.getElementById('quantity-display');
-    if (quantitySpan) {
-        let currentQuantity = parseInt(quantitySpan.textContent, 10);
-        if (!isNaN(currentQuantity)) {
-            currentQuantity += 1;
-            quantitySpan.textContent = currentQuantity.toString();
-            localStorage.setItem('quantity', currentQuantity); // Save updated quantity to local storage
-        }
-    }
-}
-
-// Function to decrease quantity
-function decreaseQuantity() {
-    const quantitySpan = document.getElementById('quantity-display');
-    if (quantitySpan) {
-        let currentQuantity = parseInt(quantitySpan.textContent, 10);
-        if (!isNaN(currentQuantity) && currentQuantity > 1) { // Ensure quantity doesn't go below 1
-            currentQuantity -= 1;
-            quantitySpan.textContent = currentQuantity.toString();
-            localStorage.setItem('quantity', currentQuantity); // Save updated quantity to local storage
-        }
-    }
-}
-
-// Function to save the cart to local storage
-function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-// Function to update cart display
-function updateCartDisplay() {
-    const cartItemsElement = document.getElementById('cart-items');
-    const cartTotalElement = document.getElementById('cart-total');
-    let total = 0;
-
-    if (cartItemsElement) {
-        cartItemsElement.innerHTML = '';
-        for (const [itemKey, item] of Object.entries(cart)) {
-            const [productName, color, size] = itemKey.split('|');
-            const itemTotal = item.price * item.quantity;
-            total += itemTotal;
-            cartItemsElement.innerHTML += `
-                <div class="cart-item">
-                    <div class="cart-item-details">
-                        <h3>${productName}</h3>
-                        <p>Color: ${color}</p>
-                        <p>Size: ${size}</p>
-                        <p>Rs.${item.price} x ${item.quantity}</p>
-                    </div>
-                    <div class="cart-item-quantity">
-                        <button class="cart-quantity-btn minus" data-product="${itemKey}">-</button>
-                        <span>${item.quantity}</span>
-                        <button class="cart-quantity-btn plus" data-product="${itemKey}">+</button>
-                    </div>
-                    <button class="cart-item-remove" data-product="${itemKey}">Remove</button>
-                </div>
-            `;
-        }
-        if (cartTotalElement) {
-            cartTotalElement.textContent = `Rs.${total.toFixed(2)}`;
-        }
-        updateCartCount();
-    }
-}
-
-// Function to add an item to the cart
-function addToCart(productName, price, quantity = 1) {
-    if (quantity > 0 && selectedColor && selectedSize && !isNaN(price) && price > 0) {
-        const itemKey = `${productName}|${selectedColor}|${selectedSize}`;
-        if (cart[itemKey]) {
-            cart[itemKey].quantity += quantity;
-        } else {
-            cart[itemKey] = { price: price, quantity: quantity, color: selectedColor, size: selectedSize };
-        }
-        saveCart();
-        updateCartDisplay();
-        openCartModal(); // Open the cart modal after adding an item
-        console.log(`Added ${quantity} of ${productName} (${selectedColor}, ${selectedSize}) to the cart at Rs.${price} each.`);
+    if (!cart[cartKey]) {
+        cart[cartKey] = {
+            name: productName,
+            quantity: quantity,
+            price: price
+        };
     } else {
-        console.log('Please select a color and size before adding to the cart.');
+        cart[cartKey].quantity += quantity;
     }
-}
 
-// Function to update the cart count
-function updateCartCount() {
-    const totalItems = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = totalItems;
-        cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
-    }
-    localStorage.setItem('cartCount', totalItems); // Save cart count to local storage
-}
-
-// Function to load the cart count from local storage on page load
-function loadCartCount() {
-    const cartCount = document.querySelector('.cart-count');
-    const savedCartCount = localStorage.getItem('cartCount') || '0';
-    if (cartCount) {
-        cartCount.textContent = savedCartCount;
-        cartCount.style.display = savedCartCount > 0 ? 'flex' : 'none';
-    }
-}
-
-// Event listener for quantity buttons
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize quantity display
-    updateQuantityDisplay();
-
-    // Load cart from local storage
-    cart = JSON.parse(localStorage.getItem('cart')) || {};
-
-    // Load cart count on page load
-    loadCartCount();
-
-    // Load cart display on page load
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCartDisplay();
+    showAddToCartSuccessMessage(productName);
+}
 
-    // Event listener for Add to Cart buttons
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            const productName = this.dataset.product;
-            const price = parseFloat(this.dataset.price);
-            const quantitySpan = document.getElementById('quantity-display');
-            if (quantitySpan) {
-                const quantity = parseInt(quantitySpan.textContent, 10);
-                if (!isNaN(quantity) && quantity > 0) {
-                    addToCart(productName, price, quantity);
-                    updateQuantityDisplay(); // Reset the displayed quantity to 1 after adding to cart
-                }
-            }
-        });
-    });
+// Update cart display (quantity, items, etc.)
+function updateCartDisplay() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || {};
+    let totalItems = 0;
 
-    // Event listener for cart modal close button
-    document.querySelector('.close-modal')?.addEventListener('click', closeCartModal);
-
-    // Event listener for quantity adjustment buttons in cart modal
-    document.addEventListener('click', function(event) {
-        if (event.target.matches('.cart-quantity-btn.plus')) {
-            const itemKey = event.target.dataset.product;
-            if (cart[itemKey]) {
-                cart[itemKey].quantity += 1;
-                saveCart();
-                updateCartDisplay();
-            }
-        } else if (event.target.matches('.cart-quantity-btn.minus')) {
-            const itemKey = event.target.dataset.product;
-            if (cart[itemKey] && cart[itemKey].quantity > 1) {
-                cart[itemKey].quantity -= 1;
-                saveCart();
-                updateCartDisplay();
-            }
-        } else if (event.target.matches('.cart-item-remove')) {
-            const itemKey = event.target.dataset.product;
-            delete cart[itemKey];
-            saveCart();
-            updateCartDisplay();
+    for (const cartKey in cart) {
+        const item = cart[cartKey];
+        if (isValidCartItem(item)) {
+            totalItems += item.quantity;
+        } else {
+            console.warn("Invalid cart item encountered while updating count", item);
         }
-    });
+    }
 
-    // Event listener for cart icon button
-    document.querySelector('.cart-icon')?.addEventListener('click', openCartModal);
+    const cartCountElement = document.getElementById('cart-count');
+    if (cartCountElement) {
+        cartCountElement.innerText = totalItems;
+    }
+}
+
+// Show success message when item is added to the cart
+function showAddToCartSuccessMessage(productName) {
+    const successMessage = document.getElementById('success-message');
+    const successText = document.getElementById('success-text');
+    if (successMessage && successText) {
+        successText.textContent = `${productName} added to cart successfully!`;
+        successMessage.style.display = 'block';
+        successMessage.style.opacity = '1';
+        successMessage.style.transform = 'translate(-50%, -50%) scale(1)';
+        setTimeout(() => {
+            closeSuccessMessage();
+        }, 3000); // Keep the message displayed for 3 seconds
+    }
+}
+
+// Close the success message
+function closeSuccessMessage() {
+    const successMessage = document.getElementById('success-message');
+    if (successMessage) {
+        successMessage.style.opacity = '0';
+        successMessage.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 300); // Match the fade-out time
+    }
+}
+
+// Increase the quantity of the product
+function increaseQuantity() {
+    const quantityDisplay = document.getElementById('quantity-display');
+    if (quantityDisplay) {
+        let currentQuantity = parseInt(quantityDisplay.textContent, 10);
+        quantityDisplay.textContent = currentQuantity + 1;
+    }
+}
+
+// Decrease the quantity of the product (don't go below 1)
+function decreaseQuantity() {
+    const quantityDisplay = document.getElementById('quantity-display');
+    if (quantityDisplay) {
+        let currentQuantity = parseInt(quantityDisplay.textContent, 10);
+        if (currentQuantity > 1) {
+            quantityDisplay.textContent = currentQuantity - 1;
+        }
+    }
+}
+
+// Change the main product image
+function changeMainImage(src) {
+    const mainImage = document.getElementById('main-image');
+    if (mainImage) {
+        mainImage.src = src;
+    }
+}
+
+// Select color and update UI
+function selectColor(button) {
+    const colorButtons = document.querySelectorAll('.color-option');
+    colorButtons.forEach(btn => btn.classList.remove('selected'));
+    button.classList.add('selected');
+    updatePrice();
+}
+
+// Select size and update UI
+function selectSize(button) {
+    const sizeButtons = document.querySelectorAll('.size-option');
+    sizeButtons.forEach(btn => btn.classList.remove('selected'));
+    button.classList.add('selected');
+    updatePrice();
+}
+
+// Update the product price based on the selected options
+function updatePrice() {
+    const productPriceElement = document.getElementById('product-price');
+    if (productPriceElement) {
+        const basePrice = parseFloat(productPriceElement.dataset.basePrice) || 0;
+        const selectedColor = document.querySelector('.color-option.selected');
+        const selectedSize = document.querySelector('.size-option.selected');
+        let newPrice = basePrice;
+        if (selectedColor) {
+            newPrice += parseFloat(selectedColor.dataset.price) || 0;
+        }
+        if (selectedSize) {
+            newPrice += parseFloat(selectedSize.dataset.price) || 0;
+        }
+        productPriceElement.textContent = `Rs. ${newPrice.toFixed(2)}`;
+    }
+}
+
+// Run this code when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartDisplay(); // Update cart count on page load
 });

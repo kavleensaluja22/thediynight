@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The DIY Night</title>
-    <script src="{% static 'cart.js' %}"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'home.css' %}">
+    <script src="{% static 'cart.js' %}"></script>
 </head>
 <body>
     <div class="container">
@@ -64,17 +64,14 @@
                         <span class="quantity" data-product="{{ product.product_name }}">0</span>
                         <button class="quantity-btn plus" data-product="{{ product.product_name }}">+</button>
                     </div>
-                    <button class="add-to-cart" onclick="addToCart('{{ product.product_name }}', {{ product.price }}, parseInt(document.querySelector('span[data-product=\'{{ product.product_name }}\']').textContent))">
-                        Add to Cart
-                    </button>
+                    <button class="add-to-cart" data-product="{{ product.product_name }}" data-price="{{ product.price }}">Add to Cart</button>
                 </article>
                 {% endfor %}
             </div>
         </main>
-        <div class="slogan">
-            Unleash your creativity with The DIY Night!
-        </div>
+        <div class="slogan">Unleash your creativity with The DIY Night!</div>
     </div>
+
     <div class="cart-modal" id="cart-modal">
         <div class="cart-modal-content">
             <div class="cart-header">
@@ -86,5 +83,39 @@
             <button class="checkout-btn">Proceed to Checkout</button>
         </div>
     </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCartDisplay();
+        updateCartCount();
+
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const productName = button.getAttribute('data-product');
+                const quantityElement = document.querySelector(`.quantity[data-product='${productName}']`);
+                let quantity = parseInt(quantityElement.textContent);
+
+                if (button.classList.contains('minus')) {
+                    if (quantity > 0) quantity--;
+                } else if (button.classList.contains('plus')) {
+                    quantity++;
+                }
+
+                quantityElement.textContent = quantity;
+                updateLocalStorage(productName, quantity);
+                updateCartDisplay();
+                updateCartCount();
+            });
+        });
+
+        const cartBtn = document.getElementById('cart-btn');
+        const cartModal = document.getElementById('cart-modal');
+        const closeCartBtn = document.getElementById('close-cart');
+
+        cartBtn.addEventListener('click', () => cartModal.style.display = 'block');
+        closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
+    });
+</script>
 </body>
 </html>
+

@@ -253,7 +253,6 @@ body {
     color: #ffd700;
     cursor: pointer;
 }
-
 .add-to-cart {
     background-color: #6daabd;
     color: #fff;
@@ -279,7 +278,7 @@ body {
     margin-top: 15px;
 }
 
-.quantity-btn {
+.quantity-button {
     background-color: #f0f0f0;
     border: none;
     width: 30px;
@@ -293,11 +292,11 @@ body {
     justify-content: center;
 }
 
-.quantity-btn:hover {
+.quantity-button:hover {
     background-color: #e0e0e0;
 }
 
-.quantity {
+.quantity-display {
     font-size: 18px;
     font-weight: bold;
 }
@@ -533,3 +532,81 @@ body {
     }
 
 }
+
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 120px;
+    margin: 10px 0;
+}
+
+.quantity-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    width: 30px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.quantity-btn:hover {
+    background-color: #555;
+}
+
+.quantity {
+    font-size: 16px;
+    width: 30px;
+    text-align: center;
+}
+/* Add to Cart Button */
+.add-to-cart {
+    background-color: #ff6b6b;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+.add-to-cart:hover {
+    background-color: #ff4d4d;
+}
+
+/* Quantity Control Buttons */
+.quantity-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.quantity-btn.plus {
+    border-radius: 0 5px 5px 0;
+}
+
+.quantity-btn.minus {
+    border-radius: 5px 0 0 5px;
+}
+
+.quantity-btn:hover {
+    background-color: #ddd;
+}
+
+/* Quantity Display */
+.quantity {
+    display: inline-block;
+    padding: 5px 15px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    text-align: center;
+    min-width: 30px;
+}
+

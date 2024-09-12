@@ -1,4 +1,4 @@
-{% load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +7,67 @@
     <title>Product Page</title>
     <script src="{% static 'cart.js' %}"></script>
     <link rel="stylesheet" href="{% static 'prodd.css' %}">
+    <style>
+        #success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            color: #28a745;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            display: none;
+            z-index: 9999;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+        #success-message.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        #success-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        #success-text {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        #success-close {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        #success-close:hover {
+            background-color: #218838;
+        }
+        @media (max-width: 768px) {
+            #success-message {
+                padding: 15px 20px;
+            }
+            #success-icon {
+                font-size: 36px;
+            }
+            #success-text {
+                font-size: 16px;
+            }
+            #success-close {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -53,7 +114,7 @@
                         <span class="quantity-display" id="quantity-display">1</span>
                         <button class="quantity-button" onclick="increaseQuantity()">+</button>
                     </div>
-                    <button class="add-to-cart" onclick="addToCart('{{ product.product_name }}', {{ product.price }}, parseInt(document.getElementById('quantity-display').textContent))">
+                    <button class="add-to-cart" onclick="addToCart('{{ product.product_name }}', {{ product.price }}, getCurrentQuantity())">
                         Add to Cart
                     </button>
                 </div>
@@ -102,8 +163,6 @@
                     <input type="hidden" id="productUid" name="product_uid" value="{{ product.uid }}" />
                     <button class="review-submit" type="submit">Submit Review</button>
                 </form>
-                
-                
                 <div class="reviews-list" id="reviewsList"></div>
                 <div class="review-preview" id="reviewPreview">
                     <h3>Your Review Preview</h3>
@@ -114,19 +173,41 @@
             </section>
         </main>
     </div>
- <!-- Cart Modal -->
-<div id="cartModal" class="cart-modal">
-    <div class="cart-modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Your Cart</h2>
-        <div id="cart-items"></div>
-        <p id="cart-total">Rs.0.00</p>
-        <button class="cart-checkout">Checkout</button>
+    <div id="cartModal" class="cart-modal">
+        <div class="cart-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cart-items"></div>
+            <p id="cart-total">Rs. 0.00</p>
+            <button class="cart-checkout">Checkout</button>
+        </div>
     </div>
-</div>
-
-  
-        
+    <div id="success-message">
+        <div id="success-icon">✓</div>
+        <p id="success-text">Product added to cart successfully!</p>
+        <button id="success-close" onclick="closeSuccessMessage()">Close</button>
+    </div>
+    <script>
+        function showSuccessMessage() {
+            const successMessage = document.getElementById('success-message');
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.classList.add('show');
+            }, 10);
+            setTimeout(() => {
+                closeSuccessMessage();
+            }, 3000);
+        }
+        function closeSuccessMessage() {
+            const successMessage = document.getElementById('success-message');
+            successMessage.classList.remove('show');
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 300);
+        }
+        function addToCart(productName, price, quantity) {
+            showSuccessMessage();
+        }
+    </script>
 </body>
-
 </html>
