@@ -20,27 +20,34 @@ from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.conf import settings
 import uuid 
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 
 def sign(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        user_obj = User.objects.filter(username = email)
-
-        if user_obj.exists():
-            messages.warning(request, 'Email is already taken. ')
+        if User.objects.filter(username=email).exists():
+            messages.warning(request, 'Email is already taken.')
             return HttpResponseRedirect(request.path_info)
-        
-        user_obj=User.objects.create(first_name=first_name,last_name=last_name, email=email, username=email)
-        user_obj.set_password(password)
+
+        # Create and save the new user
+        user_obj = User.objects.create_user(
+            first_name=first_name, 
+            last_name=last_name, 
+            email=email, 
+            username=email,
+            password=password
+        )
         user_obj.save()
 
-        messages.success(request, 'An Email has been sent on your mail  ')
-        return HttpResponseRedirect(request.path_info)
-
+        messages.success(request, 'Account created successfully. Please check your email for confirmation.')
+        return redirect('user_login')  # Redirect to login page or another URL
 
     return render(request, "user/sign.html")
 
@@ -89,19 +96,19 @@ def activate_email(request, email_token):
     
     
 
-def add_to_cart(request , uid):
-    variant = request.GET.get('variant')
-    product = Product.objects.get(uid = uid)
-    user = request.user 
-    cart , _ = Cart.objects.get_or_create(user = user , is_paid = False)
-    cart_items = CartItems.objects.create(cart=cart , product=product)
+# def add_to_cart(request , uid):
+#     variant = request.GET.get('variant')
+#     product = Product.objects.get(uid = uid)
+#     user = request.user 
+#     cart , _ = Cart.objects.get_or_create(user = user , is_paid = False)
+#     cart_items = CartItems.objects.create(cart=cart , product=product)
 
-    if variant:
-        variant = request.GET.get('variant')
-        size_variant = SizeVariant.objects.get(size_name = variant)
-        CartItems.size_variant=size_variant 
-        CartItems.save()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+#     if variant:
+#         variant = request.GET.get('variant')
+#         size_variant = SizeVariant.objects.get(size_name = variant)
+#         CartItems.size_variant=size_variant 
+#         CartItems.save()
+#     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
 
 def remove_cart(request , cart_item_uid):
@@ -182,29 +189,34 @@ def add_to_cart(request, product_id=None, uid=None):
     elif uid:
         product = get_object_or_404(Product, uid=uid)
     else:
-        product = get_object_or_404(Product, id=product_id)
-        size_name = request.GET.get('size')
-        color_name = request.GET.get('color')
-        quantity = int(request.GET.get('quantity', 1))
+        return redirect('home')  # Redirect to home or an error page if no product_id or uid is provided
 
-        size = SizeVariant.objects.get(size_name=size_name) if size_name else None
-        color = ColorVariant.objects.get(color_name=color_name) if color_name else None
+    size_name = request.GET.get('size')
+    color_name = request.GET.get('color')
+    quantity = int(request.GET.get('quantity', 1))
 
-        cart_item, created = Cart.objects.get_or_create(
-            user=request.user,
-            product=product,
-            size=size,
-            color=color
-         )
-        cart_item.quantity += quantity
-        cart_item.save()
+    size = SizeVariant.objects.get(size_name=size_name) if size_name else None
+    color = ColorVariant.objects.get(color_name=color_name) if color_name else None
 
-        return redirect('cart')
+    cart_item, created = Cart.objects.get_or_create(
+        user=request.user,
+        product=product,
+        size=size,
+        color=color
+    )
+
+    # Update quantity
+    cart_item.quantity += quantity
+    cart_item.save()
+
+    return redirect('cart')
+
 
 @login_required
 def cart(request):
     cart_items = Cart.objects.filter(user=request.user)
     return render(request, 'home/cart.html', {'cart_items': cart_items})
+
 
 @login_required
 def update_quantity(request, cart_id):
@@ -221,3 +233,5 @@ def track(request):
     return render(request,'home/track.html')
 def user(request):
     return render(request,'home/user.html')
+
+

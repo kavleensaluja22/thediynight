@@ -58,5 +58,14 @@ from .models import Review
 
 admin.site.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ['product', 'user', 'rating', 'text', 'created_at']
+    list_display = ['product', 'user', 'rating', 'text', 'created_at','media']
     search_fields = ['product__product_name', 'user__username']
+
+
+from .models import Order
+
+admin.site.register(Order)
+
+from .models import OrderItem
+
+admin.site.register(OrderItem)

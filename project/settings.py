@@ -41,8 +41,22 @@ INSTALLED_APPS = [
     'accounts',
     'appname',
     'base',
+    'allauth', #from here
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google', 
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.apple',
+    'django.contrib.sites',  # Required by Django Allauth
+  
+  
 ]
 
+AUTHENTICATION_BACKENDS =[
+    'allauth.account.auth_backends.AuthenticationBackend',  # Correct spelling here # google
+    'django.contrib.auth.backends.ModelBackend',  # For Django's default authentication
+    
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -52,7 +66,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.CartMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
+
 
 ROOT_URLCONF = 'project.urls'
 
@@ -71,7 +87,28 @@ TEMPLATES = [
         },
     },
 ]
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '182188989997-patnmavcel670qqni4ib1bv0ifi9c53h.apps.googleusercontent.com',
+            'secret': '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',
+        },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'METHOD': 'oauth2',
+        'VERIFIED_EMAIL': True,
+    },
+    'facebook': {
+        'APP': {
+            'client_id': '1202659857643739',
+            'secret': '220f187742ab76d44706051d31f610dc',
+        },
+    }
+}
 
+
+# SOCIAL_AUTH_FACEBOOK_KEY ="1202659857643739"
+# SOCIAL_AUTH_FACEBOOK_SECRET="220f187742ab76d44706051d31f610dc"
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
@@ -134,6 +171,7 @@ STATICFILES_DIRS = [
     
 ] 
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -148,3 +186,10 @@ EMAIL_HOST_USER = "kavleensaluja22@gmail.com"
 EMAIL_HOST_PASSWORD = "njth yuiq zmjo rrqb"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+LOGIN_REDIRECT_URL = 'success'
+
+
+
+SITE_ID = 2

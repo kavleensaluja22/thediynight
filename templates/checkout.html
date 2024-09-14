@@ -1,0 +1,318 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <script src="{% static 'cart.js' %}"></script>
+    <script src="{% static 'home.js' %}"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            display: grid;
+            gap: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .payment-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .payment-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .payment-option.active {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        #order-confirmation {
+            display: none;
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        #cart-review {
+            margin-bottom: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #333;
+        }
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-item {
+            text-decoration: none;
+            color: #333;
+        }
+        .cart-icon {
+            position: relative;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="/" class="logo">@thediynight</a>
+            <nav class="nav">
+                <a href="/" class="nav-item">Shop</a>
+                <a href="/track" class="nav-item">Track</a>
+                <a href="/user" class="nav-item">User</a>
+                <div class="cart-icon">
+                    <button class="nav-item" id="cart-btn">Cart</button>
+                    <span class="cart-count" id="cart-count">0</span>
+                </div>
+            </nav>
+        </header>
+        <h1>Checkout</h1>
+        <div id="cart-review">
+            <h2>Review Your Cart</h2>
+            <div id="cart-items"></div>
+            <p><strong>Total: </strong><span id="cart-total"></span></p>
+        </div>
+        <form id="checkout-form">
+            <div>
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+            <div>
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+            <div>
+                <label for="country">Country:</label>
+                <select id="country" name="country" required>
+                    <option value="">Select a country</option>
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="AU">Australia</option>
+                    <option value="IN">India</option>
+                </select>
+            </div>
+            <div>
+                <label>Payment Method:</label>
+                <div class="payment-options">
+                    <div class="payment-option active" data-method="card">Credit Card</div>
+                    <div class="payment-option" data-method="upi">UPI</div>
+                    <div class="payment-option" data-method="gpay">Google Pay</div>
+                </div>
+            </div>
+            <div id="card-details">
+                <div>
+                    <label for="card-number">Card Number:</label>
+                    <input type="text" id="card-number" name="card-number" required>
+                </div>
+                <div>
+                    <label for="expiry-date">Expiry Date:</label>
+                    <input type="text" id="expiry-date" name="expiry-date" placeholder="MM/YY" required>
+                </div>
+                <div>
+                    <label for="cvv">CVV:</label>
+                    <input type="text" id="cvv" name="cvv" required>
+                </div>
+            </div>
+            <div id="upi-details" style="display: none;">
+                <div>
+                    <label for="upi-id">UPI ID:</label>
+                    <input type="text" id="upi-id" name="upi-id">
+                </div>
+            </div>
+            <div id="gpay-details" style="display: none;">
+                <div>
+                    <label for="gpay-number">Google Pay Number:</label>
+                    <input type="tel" id="gpay-number" name="gpay-number">
+                </div>
+            </div>
+            <button type="submit">Place Order</button>
+        </form>
+        <div id="order-confirmation"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('checkout-form');
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            const cardDetails = document.getElementById('card-details');
+            const upiDetails = document.getElementById('upi-details');
+            const gpayDetails = document.getElementById('gpay-details');
+            const orderConfirmation = document.getElementById('order-confirmation');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+
+            function displayCartItems() {
+                const cart = JSON.parse(localStorage.getItem('cart')) || {};
+                let totalAmount = 0;
+                cartItems.innerHTML = '';
+                for (const [key, item] of Object.entries(cart)) {
+                    const itemTotal = item.price * item.quantity;
+                    totalAmount += itemTotal;
+                    cartItems.innerHTML += `
+                        <div class="cart-item">
+                            <span>${item.name} (${item.quantity})</span>
+                            <span>Rs. ${itemTotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+                cartTotal.textContent = `Rs. ${totalAmount.toFixed(2)}`;
+            }
+
+            displayCartItems();
+
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    paymentOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    const method = this.dataset.method;
+                    cardDetails.style.display = method === 'card' ? 'block' : 'none';
+                    upiDetails.style.display = method === 'upi' ? 'block' : 'none';
+                    gpayDetails.style.display = method === 'gpay' ? 'block' : 'none';
+                });
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const orderData = Object.fromEntries(formData.entries());
+                orderData.paymentMethod = document.querySelector('.payment-option.active').dataset.method;
+                orderData.items = JSON.parse(localStorage.getItem('cart') || '{}');
+                orderData.totalAmount = parseFloat(cartTotal.textContent.replace('Rs. ', ''));
+
+                fetch('/api/orders/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(orderData),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to save order');
+                    }
+                    return response.json();
+                })
+                .then(orderDetails => {
+                    displayOrderConfirmation(orderDetails);
+                    localStorage.removeItem('cart');
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+            });
+
+            function displayOrderConfirmation(orderDetails) {
+                orderConfirmation.innerHTML = `
+                    <h2>Order Placed Successfully!</h2>
+                    <p>Order ID: ${orderDetails.orderId}</p>
+                    <p>Total Amount: Rs. ${orderDetails.totalAmount.toFixed(2)}</p>
+                    <p>A confirmation email has been sent to your email address.</p>
+                `;
+                orderConfirmation.style.display = 'block';
+                form.style.display = 'none';
+            }
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+</body>
+</html>

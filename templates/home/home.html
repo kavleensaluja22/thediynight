@@ -5,10 +5,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The DIY Night</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="http://b.io/ext_5-" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'home.css' %}">
     <script src="{% static 'cart.js' %}"></script>
+    <script src="{% static 'home.js' %}"></script>
 </head>
+<style>
+    #cart-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+    
+    .cart-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        max-width: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+    }
+    
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .cart-item-name {
+        flex: 1;
+    }
+    
+    .cart-item-controls {
+        display: flex;
+        align-items: center;
+    }
+    
+    .cart-quantity-btn {
+        background-color: #f0f0f0;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    
+    .cart-item-quantity {
+        margin: 0 10px;
+    }
+    
+    .cart-item-price {
+        margin-left: 20px;
+    }
+    
+    .remove-item {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    
+    #cart-total {
+        font-weight: bold;
+        margin-top: 20px;
+    }
+    
+    #close-cart {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    }
+</style>
 <body>
     <div class="container">
         <header class="header">
@@ -28,6 +110,8 @@
                 <input type="text" class="search-input" placeholder="Search products" aria-label="Search products">
                 <button type="submit" class="search-button" aria-label="Submit search">Search</button>
             </form>
+
+            
             <section class="category-section">
                 <h2 class="category-title">Browse Categories</h2>
                 <div class="category-grid">
@@ -61,7 +145,7 @@
                     </div>
                     <div class="quantity-control">
                         <button class="quantity-btn minus" data-product="{{ product.product_name }}">-</button>
-                        <span class="quantity" data-product="{{ product.product_name }}">0</span>
+                        <span class="quantity" data-product="{{ product.product_name }}">1</span>
                         <button class="quantity-btn plus" data-product="{{ product.product_name }}">+</button>
                     </div>
                     <button class="add-to-cart" data-product="{{ product.product_name }}" data-price="{{ product.price }}">Add to Cart</button>
@@ -71,7 +155,6 @@
         </main>
         <div class="slogan">Unleash your creativity with The DIY Night!</div>
     </div>
-
     <div class="cart-modal" id="cart-modal">
         <div class="cart-modal-content">
             <div class="cart-header">
@@ -83,39 +166,5 @@
             <button class="checkout-btn">Proceed to Checkout</button>
         </div>
     </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        updateCartDisplay();
-        updateCartCount();
-
-        document.querySelectorAll('.quantity-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const productName = button.getAttribute('data-product');
-                const quantityElement = document.querySelector(`.quantity[data-product='${productName}']`);
-                let quantity = parseInt(quantityElement.textContent);
-
-                if (button.classList.contains('minus')) {
-                    if (quantity > 0) quantity--;
-                } else if (button.classList.contains('plus')) {
-                    quantity++;
-                }
-
-                quantityElement.textContent = quantity;
-                updateLocalStorage(productName, quantity);
-                updateCartDisplay();
-                updateCartCount();
-            });
-        });
-
-        const cartBtn = document.getElementById('cart-btn');
-        const cartModal = document.getElementById('cart-modal');
-        const closeCartBtn = document.getElementById('close-cart');
-
-        cartBtn.addEventListener('click', () => cartModal.style.display = 'block');
-        closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
-    });
-</script>
 </body>
 </html>
-

@@ -1,0 +1,11 @@
+<h1>Search Results</h1>
+
+{% if products %}
+    <ul>
+        {% for product in products %}
+            <li>{{ product.name }} (Category: {{ product.category.name }})</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No products found matching "{{ query }}".</p>
+{% endif %}
