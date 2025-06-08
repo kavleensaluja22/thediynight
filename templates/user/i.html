@@ -1,0 +1,281 @@
+{% comment %} 
+
+
+
+
+
+
+
+
+
+
+
+{% load static %}
+<script src="{% static 'cart.js' %}"></script>
+<script src="{% static 'home.js' %}"></script>
+<link rel="stylesheet" href="{% static 'home.css' %}">
+<header class="header">
+  <a href="/" class="logo">@thediynight</a>
+  <nav class="nav">
+    <a href="/" class="nav-item">Shop</a>
+    <a href="/track" class="nav-item">Track</a>
+    <a href="/user" class="nav-item">User</a>
+  </nav>
+</header>
+<div class="signup-container">
+  <div class="signup-form">
+    <h2>Sign up Here</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {% include "user/alert.html" %}
+      <div class="input-group">
+        <input type="text" id="first_name" name="first_name" required placeholder="First Name">
+      </div>
+      <div class="input-group">
+        <input type="text" id="last_name" name="last_name" required placeholder="Last Name">
+      </div>
+      <div class="input-group">
+        <input type="email" id="email" name="email" required placeholder="E-mail">
+      </div>
+      <div class="input-group">
+        <input type="password" id="password" name="password" required placeholder="Password">
+      </div>
+      <button type="submit" class="signup-button">Sign Up</button>
+    </form>
+    <p class="login-link">ALREADY HAVE AN ACCOUNT? <a href="/user_login">LOGIN HERE</a></p>
+  </div>
+  <div class="signup-image">
+    <div class="scroll-container">
+      <div class="scroll-track">
+        <img src="{% static 'product1.jpg' %}" alt="Product 1" class="scroll-item">
+        <img src="{% static 'product2.jpg' %}" alt="Product 2" class="scroll-item">
+        <img src="{% static 'product3.jpg' %}" alt="Product 3" class="scroll-item">
+        <img src="{% static 'product4.jpg' %}" alt="Product 4" class="scroll-item">
+        <img src="{% static 'product5.jpg' %}" alt="Product 5" class="scroll-item">
+        <img src="{% static 'product1.jpg' %}" alt="Product 1" class="scroll-item">
+        <img src="{% static 'product2.jpg' %}" alt="Product 2" class="scroll-item">
+        <img src="{% static 'product3.jpg' %}" alt="Product 3" class="scroll-item">
+        <img src="{% static 'product4.jpg' %}" alt="Product 4" class="scroll-item">
+        <img src="{% static 'product5.jpg' %}" alt="Product 5" class="scroll-item">
+      </div>
+    </div>
+    <div class="scroll-container reverse">
+      <div class="scroll-track">
+        <img src="{% static 'product6.jpg' %}" alt="Product 6" class="scroll-item">
+        <img src="{% static 'product7.jpg' %}" alt="Product 7" class="scroll-item">
+        <img src="{% static 'product8.jpg' %}" alt="Product 8" class="scroll-item">
+        <img src="{% static 'product9.jpg' %}" alt="Product 9" class="scroll-item">
+        <img src="{% static 'product10.jpg' %}" alt="Product 10" class="scroll-item">
+        <img src="{% static 'product6.jpg' %}" alt="Product 6" class="scroll-item">
+        <img src="{% static 'product7.jpg' %}" alt="Product 7" class="scroll-item">
+        <img src="{% static 'product8.jpg' %}" alt="Product 8" class="scroll-item">
+        <img src="{% static 'product9.jpg' %}" alt="Product 9" class="scroll-item">
+        <img src="{% static 'product10.jpg' %}" alt="Product 10" class="scroll-item">
+      </div>
+    </div>
+    <div class="scroll-container">
+      <div class="scroll-track">
+        <img src="{% static 'product11.jpg' %}" alt="Product 11" class="scroll-item">
+        <img src="{% static 'product12.jpg' %}" alt="Product 12" class="scroll-item">
+        <img src="{% static 'product13.jpg' %}" alt="Product 13" class="scroll-item">
+        <img src="{% static 'product14.jpg' %}" alt="Product 14" class="scroll-item">
+        <img src="{% static 'product15.jpg' %}" alt="Product 15" class="scroll-item">
+        <img src="{% static 'product11.jpg' %}" alt="Product 11" class="scroll-item">
+        <img src="{% static 'product12.jpg' %}" alt="Product 12" class="scroll-item">
+        <img src="{% static 'product13.jpg' %}" alt="Product 13" class="scroll-item">
+        <img src="{% static 'product14.jpg' %}" alt="Product 14" class="scroll-item">
+        <img src="{% static 'product15.jpg' %}" alt="Product 15" class="scroll-item">
+      </div>
+    </div>
+    <div class="promo-text">
+      <h3>Join Our Community</h3>
+      <p>Get exclusive deals and stay updated with the latest trends!</p>
+    </div>
+  </div>
+</div>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  .header {
+    background-color: #56888b;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    color: #fff;
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .nav {
+    display: flex;
+    gap: 1rem;
+  }
+  .nav-item {
+    color: #fff;
+    text-decoration: none;
+  }
+  .signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .signup-form {
+    background-color: #56888b;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 50%;
+    color: #fff;
+  }
+  .signup-form h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+  }
+  .input-group {
+    margin-bottom: 1rem;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #e3e3e3;
+  }
+  .signup-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #40a3ce;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .signup-button:hover {
+    background-color: #3590b5;
+  }
+  .login-link {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .login-link a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .signup-image {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-left: 2rem;
+    overflow: hidden;
+  }
+  .scroll-container {
+    width: 100%;
+    height: 100px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .scroll-track {
+    display: flex;
+    animation: scroll 30s linear infinite;
+  }
+  .scroll-container.reverse .scroll-track {
+    animation-direction: reverse;
+  }
+  .scroll-item {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    margin-right: 1rem;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  .promo-text {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .promo-text h3 {
+    color: #56888b;
+    margin-bottom: 0.5rem;
+  }
+  .promo-text p {
+    color: #333;
+  }
+  @media (max-width: 768px) {
+    .signup-container {
+      flex-direction: column;
+    }
+    .signup-form,
+    .signup-image {
+      width: 100%;
+      margin-left: 0;
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+    try:
+        profile = ProFile.objects.get(user=user)
+    except ProFile.DoesNotExist:
+        profile = None
+
+    if request.method == 'POST':
+        form = ProFileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user')  # Redirect to the profile page after saving
+    else:
+        form = ProFileForm(instance=profile)
+
+    return render(request, "home/user.html", {"form": form, "profile": profile})
+
+
+
+    def activate_email(request, email_token):
+    try:
+        user_profile = ProFile.objects.get(email_token=email_token)
+        user = user_profile.user
+
+        # ✅ Activate user account
+        user.is_active = True
+        user.save()
+
+        # ✅ Update ProFile with user details, including name & email
+        user_profile.name = f"{user.first_name} {user.last_name}".strip() or user.username
+        user_profile.email = user.email  # Store email in profile
+        user_profile.is_email_verified = True
+        user_profile.email_token = None  # Clear token after verification
+        user_profile.save()
+
+        # messages.success(request, "Your account has been activated! You can now log in.")
+        return redirect('/')
+    except ProFile.DoesNotExist:
+        return HttpResponse('Invalid Email Token', status=404) if the user has not verify his email in first and ask for another mail again send hime another mail dont show profile has alredy exists because dont make profile of user not in user model and nor in profile model if he hasnt verified yet dont make users profile in user model nor in profile model and save user data in profile if he sucessfully verify his email  {% endcomment %}

@@ -1,9 +1,7 @@
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if message.tags %}{{ message.tags}}{% endif %}" role="alert">
-    {{message}}
+{% if messages %} {% for message in messages %}
+<div
+  class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% endif %}"
+>
+  {{ message }}
 </div>
-{% endfor %}
-
-   
-{% endif %}
+{% endfor %} {% endif %}

@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Categories</title>
     <link href="http://b.io/ext_6-" rel="stylesheet">
-    <script src="{% static 'cart.js' %}"></script>
-    <script src="{% static 'home.js' %}"></script>
+    {% comment %} <script src="{% static 'cart.js' %}"></script>
+    <script src="{% static 'home.js' %}"></script> {% endcomment %}
     <style>
         * {
             box-sizing: border-box;
@@ -748,17 +748,356 @@
     align-items: center;
     transition: all 0.3s ease;
 }
-        
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #6daabd;
+    text-decoration: none;
+}
+
+
+.category-section {
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.category-title {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    width: 120px;
+    height: 120px;
+    justify-content: center;
+}
+
+.category-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+
+
+.category-icon {
+    width: 170px;
+    height: 50px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.category-name {
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
+
+
+.cart-notification {
+    position: fixed;
+    top: 10%;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.cart-notification.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* Style the quantity control container */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f8f8;
+    padding: 6px 10px;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Quantity buttons with Turtle Blue */
+.quantity-button {
+    background: #6daabd; /* Turtle Blue */
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.quantity-button:hover {
+    background: #1F7EC4; /* Darker shade of Turtle Blue */
+}
+
+/* Quantity display */
+.quantity {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Add to Cart button */
+.add-to-cart {
+    background: #6daabd;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: block;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.add-to-cart:hover {
+    background: #218838;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .quantity-control {
+        gap: 5px;
+    }
+    
+    .quantity-button {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+
+    .add-to-cart {
+        font-size: 14px;
+        padding: 8px 14px;
+    }
+}
+
+.cart-modal { position: fixed; top: 0; right: 0; width: 350px; height: 100%; background: #fff; box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2); padding: 20px; overflow-y: auto; }
+.cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+.cart-item .quantity-controls { display: flex; align-items: center; }
+.quantity-controls button { background: #ddd; border: none; padding: 5px 10px; margin: 0 5px; cursor: pointer; }
+
+
+.cart-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+    font-size: 14px;
+    z-index: 1000;
+}
+#back-to-shipping {
+    background-color: #6daabd; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* Remove default border */
+    padding: 10px 20px; /* Adjust padding */
+    font-size: 16px; /* Set font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease-in-out;
+}
+
+#back-to-shipping:hover {
+    background-color: #5a97a1; /* Darker shade on hover */
+}
+
+
+
+
+.category-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding: 10px 0;
+}
+
+.category-grid::-webkit-scrollbar {
+    display: none;
+}
+
+.category-item {
+    flex: 0 0 auto;
+    text-align: center;
+    margin: 0 15px;
+    width: 150px;       /* Fixed width to control layout */
+    height: 170px;      /* Height to control vertical size */
+}
+
+.category-icon {
+    width: 120px;       /* Increased width for larger image */
+    height: 150px;      /* Increased height for vertical size */
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    margin: 0 auto 10px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);  /* Optional: subtle shadow for depth */
+}
+
+.category-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6daabd;
+    background-color: #f0f8f8;
+    padding: 4px 8px;
+    border-radius: 8px;
+    margin-top: 5px;
+    word-wrap: break-word;
+}
+
+.category-section {
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .category-grid {
+        display: flex;
+        overflow-x: auto;
+        gap: 12px;
+    }
+    .category-item {
+        flex: 0 0 auto;
+    }
+}
+.product-rating {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+.product-rating .star {
+    color: gold;
+    font-size: 18px;
+    margin-right: 2px;
+}
+.product-rating .star.empty {
+    color: lightgray;
+}
+
+.price-and-rating {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;  /* Allows wrapping on small screens if needed */
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.product-rating .star {
+    color: gold;
+    font-size: 18px;
+    margin-right: 2px;
+}
+
+.product-rating .star.empty {
+    color: lightgray;
+}
+
+/* Optional: fine-tune for very small screens */
+@media (max-width: 400px) {
+    .price-and-rating {
+        justify-content: space-between;
+        width: 100%;
+    }
+    .product-price {
+        font-size: 14px;
+    }
+    .product-rating .star {
+        font-size: 16px;
+    }
+}
+
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <div class="logo">@thediynight</div>
+            <a href="/" class="logo">@thediynight</a>
             <nav class="nav">
                 <a href="/" class="nav-item">Shop</a>
-                <a href="/track" class="nav-item">Track</a>
-                <a href="/user" class="nav-item">User</a>
+                {% comment %} <a href="/track" class="nav-item">Track</a> {% endcomment %}
+                <a href="/user/" class="nav-item">
+                    {% if request.user.is_authenticated %}
+                        {{ request.user.username }}
+                    {% else %}
+                        User
+                    {% endif %}
+                </a>
                 <div class="cart-icon">
                     <button class="nav-item" id="cart-btn">Cart</button>
                     <span class="cart-count" id="cart-count">0</span>
@@ -767,24 +1106,9 @@
         </header>
         <main class="main-content">
             <h2 class="category-title" style="font-size: 20px; color: #333; margin-bottom: 15px;">BROWSE CATEGORIES</h2>
-            <form class="search-bar">
-                <input type="text" class="search-input" placeholder="Search products" aria-label="Search products">
-                <button type="submit" class="search-button" aria-label="Submit search">Search</button>
-            </form>
-            <section class="category-section" style="padding: 20px;">
-                <div class="category-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
-                    {% for category in categories %}
-                    <a href="{% url 'category_detail' category.slug %}" class="category-item" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #333; transition: transform 0.3s ease;">
-                        <div class="category-icon" style="width: 80px; height: 80px; border-radius: 50%; background-size: cover; background-position: center; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); background-image: url('{% if category.category_image %}{{ category.category_image.url }}{% else %}/path/to/default/image.jpg{% endif %}');"></div>
-                        <span class="category-name" style="font-size: 14px; text-align: center;">{{ category.category_name }}</span>
-                    </a>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <div class="category-section">
-                <h2 class="category-title">{{ category.category_name }}</h2>
-                <div class="category-grid" id="category-grid">
+         
+            <section class="category-section">
+                <div class="category-grid">
                     {% for category in categories %}
                     <a href="{% url 'category_detail' category.slug %}" class="category-item">
                         <div class="category-icon" style="background-image: url('{% if category.category_image %}{{ category.category_image.url }}{% else %}/path/to/default/image.jpg{% endif %}');"></div>
@@ -792,7 +1116,10 @@
                     </a>
                     {% endfor %}
                 </div>
-            </div>
+            </section>
+            
+
+          
             <div class="product-grid" id="product-grid">
                 {% for product in products %}
                 <article class="product-card">
@@ -807,18 +1134,19 @@
                     </div>
                     <h3 class="product-name">{{ product.product_name }}</h3>
                     <div class="product-details">
-                        <span class="product-price">Rs.{{ product.price }}</span>
-                        <div class="product-rating">
-                            <span class="rating-stars" data-rating="4.5" data-product="{{ product.product_name }}">★★★★☆</span>
-                            <span class="rating-value">4.5</span>
+                        <div class="price-and-rating">
+                            <span class="product-price">Rs. {{ product.price }}</span>
+                            <div class="product-rating">
+                                {% for i in product.star_rating_filled %}
+                                    <span class="star">&#9733;</span>  <!-- Filled Star -->
+                                {% endfor %}
+                                {% for i in product.star_rating_empty %}
+                                    <span class="star">&#9734;</span>  <!-- Empty Star -->
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
-                    <div class="quantity-control">
-                        <button class="quantity-btn minus" data-product="{{ product.product_name }}">-</button>
-                        <span class="quantity">0</span>
-                        <button class="quantity-btn plus" data-product="{{ product.product_name }}">+</button>
-                    </div>
-                    <button class="add-to-cart" data-product="{{ product.product_name }}" data-price="{{ product.price }}">Add to Cart</button>
+              
                 </article>
                 {% endfor %}
             </div>
@@ -828,182 +1156,158 @@
         </div>
     </div>
     <div id="cartModal" class="cart-modal">
-        <div class="cart-modal-content">
-            <span class="close-modal" onclick="closeCartModal()">&times;</span>
-            <h2>Your Cart</h2>
-            <ul id="cartItems" class="cart-items"></ul>
-            <p class="cart-total">Total: <span id="cartTotal">Rs. 0</span></p>
-            <button class="cart-checkout" onclick="proceedToCheckout()">Proceed to Checkout</button>
-            <p class="cart-instructions">Free shipping on orders over Rs. 1000. Please review your order before proceeding to checkout.</p>
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-modal" onclick="closeCartModal()">✖</button>
+        </div>
+        <div id="cartItems"></div>
+        <div class="cart-total">
+            <p id="cartTotal">Total: Rs. 0</p>
         </div>
     </div>
     
+    <div id="cart-notification" class="cart-notification"></div>
+    
+    <!-- Notification -->
+<div id="cart-notification" class="cart-notification">{{productname}} added to cart!</div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const cartBtn = document.getElementById('cart-btn');
-            const cartModal = document.getElementById('cart-modal');
-            const closeCart = document.getElementById('close-cart');
-            const cartItems = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-            const cartCount = document.getElementById('cart-count');
-            const addToCartButtons = document.querySelectorAll('.add-to-cart');
-            const quantityControls = document.querySelectorAll('.quantity-control');
+  
+            document.addEventListener('DOMContentLoaded', updateCartCount);
         
-            // Load cart from localStorage or initialize it
-            let cart = JSON.parse(localStorage.getItem('cart')) || {};
-        
-            console.log("Initial cart:", cart);
-        
-            // Event listener for opening the cart modal
-            cartBtn.addEventListener('click', function() {
-                cartModal.style.display = 'block';
-                updateCartDisplay();
-            });
-        
-            // Event listener for closing the cart modal
-            closeCart.addEventListener('click', function() {
-                cartModal.style.display = 'none';
-            });
-        
-            // Close the modal when clicking outside of it
-            window.addEventListener('click', function(event) {
-                if (event.target === cartModal) {
-                    cartModal.style.display = 'none';
-                }
-            });
-        
-            // Event listener for "Add to Cart" buttons
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const productCard = this.closest('.product-card');
-                    const productName = this.dataset.product;
-                    const price = parseFloat(this.dataset.price);
-                    const quantitySpan = productCard.querySelector('.quantity');
-                    let quantity = parseInt(quantitySpan.textContent);
-        
-                    if (quantity > 0) {
-                        addToCart(productName, price, quantity);
-                        this.textContent = 'Added';
-        
-                        setTimeout(() => {
-                            this.textContent = 'Add to Cart';
-                        }, 2000);
-        
-                        quantitySpan.textContent = '1'; // Reset the quantity to 1 after adding to the cart
-                    } else {
-                        alert('Please select a quantity greater than 0.');
-                    }
-                });
-            });
-        
-            // Quantity control buttons
-            quantityControls.forEach(control => {
-                const minusBtn = control.querySelector('.minus');
-                const plusBtn = control.querySelector('.plus');
-                const quantitySpan = control.querySelector('.quantity');
-                let quantity = parseInt(quantitySpan.textContent) || 1; // Initialize quantity to 1
-        
-                minusBtn.addEventListener('click', function() {
-                    if (quantity > 1) {
-                        quantity--;
-                        quantitySpan.textContent = quantity;
-                    }
-                });
-        
-                plusBtn.addEventListener('click', function() {
-                    quantity++;
-                    quantitySpan.textContent = quantity;
-                });
-            });
-        
-            // Add item to cart
-            function addToCart(productName, price, quantity) {
-                if (cart[productName]) {
-                    cart[productName].quantity += quantity;
-                } else {
-                    cart[productName] = {
-                        price: price,
-                        quantity: quantity
-                    };
-                }
-                console.log("Cart after adding:", cart);
-                updateCartDisplay();
-                updateCartCount();
-                localStorage.setItem('cart', JSON.stringify(cart));
-            }
-        
-            // Update the cart display in the modal
-            function updateCartDisplay() {
-                cartItems.innerHTML = '';
-                let total = 0;
-        
-                for (const [productName, item] of Object.entries(cart)) {
-                    const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
-                    cartItems.innerHTML += `
-                        <div class="cart-item">
-                            <div class="cart-item-details">
-                                <h3>${productName}</h3>
-                                <p>Rs.${item.price} x ${item.quantity}</p>
-                            </div>
-                            <div class="cart-item-quantity">
-                                <button class="cart-quantity-btn minus" data-product="${productName}">-</button>
-                                <span>${item.quantity}</span>
-                                <button class="cart-quantity-btn plus" data-product="${productName}">+</button>
-                            </div>
-                            <button class="cart-item-remove" data-product="${productName}">Remove</button>
-                        </div>
-                    `;
-                }
-        
-                cartTotal.textContent = `Rs.${total.toFixed(2)}`;
-        
-                const cartQuantityButtons = cartItems.querySelectorAll('.cart-quantity-btn');
-                cartQuantityButtons.forEach(button => {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.quantity-button').forEach(button => {
                     button.addEventListener('click', function() {
-                        const productName = this.dataset.product;
-                        if (this.classList.contains('minus')) {
-                            if (cart[productName].quantity > 1) {
-                                cart[productName].quantity--;
-                            } else {
-                                delete cart[productName];
-                            }
-                        } else if (this.classList.contains('plus')) {
-                            cart[productName].quantity++;
+                        const productUid = this.getAttribute('data-product');
+                        const quantityElement = document.getElementById(`product-quantity-display-${productUid}`);
+                        let currentQuantity = parseInt(quantityElement.innerText);
+        
+                        if (this.classList.contains('increase-quantity')) {
+                            currentQuantity++;
+                        } else if (this.classList.contains('decrease-quantity') && currentQuantity > 1) {
+                            currentQuantity--;
                         }
-                        console.log("Cart after quantity change:", cart);
-                        updateCartDisplay();
-                        updateCartCount();
-                        localStorage.setItem('cart', JSON.stringify(cart));
-                    });
-                });
         
-                const removeButtons = cartItems.querySelectorAll('.cart-item-remove');
-                removeButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const productName = this.dataset.product;
-                        delete cart[productName];
-                        console.log("Cart after removal:", cart);
-                        updateCartDisplay();
-                        updateCartCount();
-                        localStorage.setItem('cart', JSON.stringify(cart));
+                        quantityElement.innerText = currentQuantity;
                     });
                 });
+            });
+        
+            function addToCart(productId, productName, productPrice) {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const quantityElement = document.getElementById(`product-quantity-display-${productId}`);
+                let quantity = parseInt(quantityElement.innerText) || 1;
+        
+                const existingProductIndex = cart.findIndex(item => item.id === productId);
+        
+                if (existingProductIndex !== -1) {
+                    cart[existingProductIndex].quantity += quantity;
+                } else {
+                    cart.push({ id: productId, name: productName, price: productPrice, quantity: quantity });
+                }
+        
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                showCartNotification(productName);
+                quantityElement.innerText = '1';
             }
         
-            // Update the cart count in the navbar
+            function updateQuantity(productId, change) {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const productIndex = cart.findIndex(item => item.id === productId);
+        
+                if (productIndex !== -1) {
+                    cart[productIndex].quantity += change;
+        
+                    if (cart[productIndex].quantity < 1) {
+                        cart.splice(productIndex, 1);
+                    }
+        
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    openCartModal();
+                    updateCartCount();
+                }
+            }
+        
+            function openCartModal() {
+                const cartModal = document.getElementById('cartModal');
+                cartModal.style.display = 'block';
+            
+                const cartItemsContainer = document.getElementById('cartItems');
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                cartItemsContainer.innerHTML = '';
+                let totalPrice = 0;
+            
+                cart.forEach(item => {
+                    totalPrice += item.price * item.quantity;
+                    cartItemsContainer.innerHTML += `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <p class="cart-item-name">${item.name}</p>
+                                <p class="cart-item-price">Rs. ${item.price}</p>
+                            </div>
+                            <div class="cart-controls">
+                                <button class="qty-btn decrease" onclick="updateQuantity('${item.id}', -1)">-</button>
+                                <span class="cart-qty" id="qty-${item.id}">${item.quantity}</span>
+                                <button class="qty-btn increase" onclick="updateQuantity('${item.id}', 1)">+</button>
+                                <button class="remove-btn" onclick="removeItemFromCart('${item.id}')">Remove</button>
+                            </div>
+                        </div>`;
+                });
+            
+                document.getElementById('cartTotal').innerText = `Total: Rs. ${totalPrice}`;
+            }
+            
+            
+        
+            function closeCartModal() {
+                document.getElementById('cartModal').style.display = 'none';
+            }
+        
+            function removeItemFromCart(productId) {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                cart = cart.filter(item => item.id !== productId);
+        
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                openCartModal();
+            }
+        
             function updateCartCount() {
-                const totalItems = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
-                cartCount.textContent = totalItems;
-                cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                let totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+                document.getElementById('cart-count').innerText = totalItems;
             }
         
-            // Initial load of cart items and count
-            updateCartDisplay();
-            updateCartCount();
-        });
+            function showCartNotification(productName) {
+                const notification = document.getElementById('cart-notification');
+                notification.innerText = `${productName} added to cart!`;
+                notification.style.display = 'block';
         
-    
-    
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 2000);
+            }
+        
+            document.getElementById('cart-btn').addEventListener('click', openCartModal);
+            document.getElementById('cartModal').addEventListener('click', function(event) {
+                if (event.target.classList.contains('close-modal')) {
+                    closeCartModal();
+                }
+            });
+        
+            document.querySelectorAll(".add-to-cart").forEach(button => {
+                button.addEventListener("click", function() {
+                    const productId = this.getAttribute("data-product");
+                    const productName = this.getAttribute("data-name");
+                    const productPrice = parseFloat(this.getAttribute("data-price"));
+                    addToCart(productId, productName, productPrice);
+                });
+            });
+        
+            updateCartCount();
+     
+        
+
+    </script>
 </body>
     </html>        

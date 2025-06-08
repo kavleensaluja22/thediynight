@@ -1,368 +1,666 @@
 
 {% load static %}
 {% load socialaccount %}
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <script src="{% static 'cart.js' %}"></script>
-    <script src="{% static 'home.js' %}"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thediynight - Sign In</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="stylesheet" href="{% static 'home.css' %}">
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideIn {
-            from { transform: translateY(-20px); }
-            to { transform: translateY(0); }
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            animation: slideIn 0.5s ease-out;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #56888b;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .logo:hover {
-            color: #401818;
-        }
-        .nav {
-            display: flex;
-            gap: 1.5rem;
-        }
-        .nav-item {
-            color: #333;
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: color 0.3s;
-            position: relative;
-        }
-        .nav-item::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background-color: #56888b;
-            transition: width 0.3s;
-        }
-        .nav-item:hover::after {
-            width: 100%;
-        }
-        .login-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(86, 136, 139, 0.8), rgba(64, 24, 24, 0.8));
-            animation: fadeIn 1s ease-out;
-        }
-        .login-content {
-            background-color: #fff;
-            border-radius: 20px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 1000px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            animation: slideIn 0.5s ease-out;
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-        }
-        .login-logo {
-            width: 180px;
-            margin-bottom: 2rem;
-            animation: fadeIn 1s ease-out;
-        }
-        .login-title {
-            font-size: 2.5rem;
-            color: #333;
-            margin-bottom: 2rem;
-            animation: fadeIn 1s ease-out 0.5s both;
-        }
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            width: 48%;
-            background-color: #f9f9f9;
-            padding: 2rem;
-            border-radius: 15px;
-        }
-        .form-group {
-            text-align: left;
-            animation: fadeIn 1s ease-out 0.7s both;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.7rem;
-            color: #555;
-            font-size: 1.2rem;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .form-group input:focus {
-            border-color: #56888b;
-            box-shadow: 0 0 0 3px rgba(86, 136, 139, 0.2);
-            outline: none;
-        }
-        .forgot-password {
-            text-align: right;
-            color: #401818;
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: color 0.3s;
-            display: inline-block;
-            margin-top: 0.5rem;
-        }
-        .forgot-password:hover {
-            color: #56888b;
-            text-decoration: underline;
-        }
-        .login-button {
-            background-color: #56888b;
-            color: #fff;
-            border: none;
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            animation: fadeIn 1s ease-out 0.9s both;
-        }
-        .login-button:hover {
-            background-color: #401818;
-        }
-        .login-button:active {
-            transform: scale(0.98);
-        }
-        .divider {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            margin: 0 2rem;
-            animation: fadeIn 1s ease-out 1.1s both;
-        }
-        .divider::before,
-        .divider::after {
-            content: '';
-            width: 1px;
-            height: 100px;
-            background-color: #ddd;
-        }
-        .divider span {
-            padding: 1rem 0;
-            color: #777;
-            font-size: 1.2rem;
-            white-space: nowrap;
-        }
-        .social-login {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            animation: fadeIn 1s ease-out 1.3s both;
-            width: 48%;
-            justify-content: center;
-        }
-        .social-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            padding: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s, border-color 0.3s;
-        }
-        .social-button:hover {
-            background-color: #f5f5f5;
-            border-color: #56888b;
-        }
-        .social-button:active {
-            transform: scale(0.98);
-        }
-        .social-icon {
-            width: 28px;
-            height: 28px;
-        }
-        .google {
-            background-color: #DB4437;
-            color: white;
-        }
-        .apple {
-            background-color: #000000;
-            color: white;
-        }
-        .facebook {
-            background-color: #4267B2;
-            color: white;
-        }
-        .signup-link {
-            margin-top: 2rem;
-            font-size: 1.2rem;
-            animation: fadeIn 1s ease-out 1.5s both;
-        }
-        .signup-link a {
-            color: #56888b;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-        .signup-link a:hover {
-            color: #401818;
-            text-decoration: underline;
-        }
-        @media (max-width: 1024px) {
-            .login-content {
-                flex-direction: column;
-                align-items: center;
-            }
-            .login-form,
-            .social-login {
-                width: 100%;
-            }
-            .divider {
-                flex-direction: row;
-                width: 100%;
-                margin: 2rem 0;
-            }
-            .divider::before,
-            .divider::after {
-                width: 100px;
-                height: 1px;
-            }
-            .divider span {
-                padding: 0 1rem;
-            }
-        }
-        @media (max-width: 768px) {
-            .login-content {
-                padding: 2rem;
-                max-width: 100%;
-            }
-            .header {
-                padding: 1rem;
-            }
-            .logo {
-                font-size: 1.5rem;
-            }
-            .nav-item {
-                font-size: 1rem;
-            }
-            .login-title {
-                font-size: 2rem;
-            }
-            .form-group label {
-                font-size: 1.1rem;
-            }
-            .form-group input {
-                font-size: 1rem;
-            }
-            .login-button {
-                font-size: 1.2rem;
-            }
-            .social-button {
-                font-size: 1.1rem;
-            }
-        }
+      /* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Login Page */
+.login-page {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+}
+
+/* Login Container */
+.login-container {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  width: 100%;
+}
+
+/* Shared Section Styles */
+.login-form-section,
+.products-section {
+  width: 50%;
+  min-height: 100vh;
+  overflow: auto;
+  padding: 48px;
+  box-sizing: border-box;
+}
+
+.login-form-section {
+  background-color: #f8fafc;
+}
+
+.products-section {
+  background-color: white;
+}
+
+/* Login Form Layout */
+.login-form-wrapper {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Brand Header */
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.brand-logo {
+  width: 56px;
+  height: 56px;
+  background-color: #6daabd;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(109, 170, 189, 0.2);
+}
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.brand-name {
+  font-size: 26px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.brand-tagline {
+  font-size: 15px;
+  color: #666666;
+}
+
+/* Login Header */
+.login-header {
+  margin-bottom: 32px;
+}
+
+.login-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.login-subtitle {
+  font-size: 16px;
+  color: #666666;
+}
+
+/* Social Login Buttons */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.google-login-btn,
+.facebook-login-btn {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 16px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.google-login-btn {
+  background-color: white;
+  border: 2px solid #e5e7eb;
+}
+
+.facebook-login-btn {
+  background-color: #1877f2;
+  border: none;
+}
+
+.google-icon,
+.facebook-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.facebook-icon {
+  color: white;
+}
+
+.social-btn-text {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.google-login-btn .social-btn-text {
+  color: #1a1a1a;
+}
+
+.facebook-login-btn .social-btn-text {
+  color: white;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+.divider-text {
+  font-size: 14px;
+  color: #666666;
+}
+
+/* Login Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  height: 56px;
+  padding: 0 20px;
+  background-color: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #6daabd;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #666666;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Form Options */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.remember-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #6daabd;
+  border: 2px solid #e5e7eb;
+  border-radius: 4px;
+}
+
+.remember-label {
+  font-size: 14px;
+  color: #666666;
+}
+
+.forgot-password {
+  font-size: 14px;
+  color: #6daabd;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Sign In Button */
+.signin-btn {
+  width: 100%;
+  height: 56px;
+  background-color: #6daabd;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Spinner Animation */
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sign Up Prompt */
+.signup-prompt {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.signup-text {
+  font-size: 14px;
+  color: #666666;
+}
+
+.signup-link {
+  color: #6daabd;
+  font-weight: 500;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+/* Products Section */
+.products-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.products-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 32px;
+}
+
+.products-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* Product Card */
+.product-card {
+  background-color: #f8fafc;
+  border-radius: 20px;
+  padding: 24px;
+  transition: transform 0.2s;
+}
+
+.product-image-container {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  background-color: white;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.product-description {
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 16px;
+}
+
+.product-price {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6daabd;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-form-section,
+  .products-section {
+    width: 100%;
+    min-height: 50vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-form-section,
+  .products-section {
+    padding: 24px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+</style>
+
     </style>
-</head>
-<body>
-    <header class="header">
-        <a href="/" class="logo">@thediynight</a>
-        <nav class="nav">
-            <a href="/" class="nav-item">Shop</a>
-            <a href="/track" class="nav-item">Track</a>
-            <a href="/user" class="nav-item">User</a>
-        </nav>
-    </header>
-    <div class="login-container">
-        <div class="login-content">
+  </head>
+  <body>
+
+
+
+    <main
+      x-data="{
+      email: '',
+      password: '',
+      isLoading: false,
+      showPassword: false,
+      rememberMe: false,
+      handleSubmit() {
+        this.isLoading = true;
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 2000);
+      },
+      handleGoogleLogin() {
+        this.isLoading = true;
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 2000);
+      },
+      handleFacebookLogin() {
+        this.isLoading = true;
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 2000);
+      }
+    }"
+      class="login-page"
+    >
+
+    
+      <div class="login-container">
+        <section class="login-form-section">
+          <div class="login-form-wrapper">
+            <header class="brand-header flex flex-col items-center text-center">
+              <div class="brand-logo">
+                <img src="{% static 'logo.jpg' %}" alt="Thediynight Logo" class="brand-icon" style="width: 120px; height: auto;">
+
+            </div>
+              <div>
+                <h2 class="brand-name">Thediynight</h2>
+                <p class="brand-tagline">Welcome back!</p>
+              </div>
+            </header>
+            
+
+            <div class="login-header">
+              <h1 class="login-title">Sign in to your account</h1>
+              <p class="login-subtitle">Access your shopping paradise</p>
+            </div>
+            <div class="social-login">
+                <a href="{% provider_login_url 'google' process='login' %}" onclick="redirectToGmail()">
+                  <button
+                    type="button"
+                    class="google-login-btn"
+                    x-data="{ hover: false }"
+                    x-on:mouseenter="hover = true"
+                    x-on:mouseleave="hover = false"
+                    x-bind:style="{
+                      transform: hover ? 'translateY(-2px)' : 'translateY(0)',
+                      boxShadow: hover ? '0 16px 32px rgba(0,0,0,0.08)' : '0 4px 8px rgba(0,0,0,0.04)'
+                    }"
+                  >
+                    <svg class="google-icon" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      ></path>
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      ></path>
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      ></path>
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      ></path>
+                    </svg>
+                    <span class="social-btn-text">Continue with Google</span>
+                  </button>
+                </a>
+              </div>
+
+              
+
+            <div class="divider">
+              <div class="divider-line"></div>
+              <span class="divider-text">or continue with email</span>
+              <div class="divider-line"></div>
+            </div>
+           
             <form method="POST" class="login-form">
                 {% csrf_token %}
                 {% include "user/alert.html" %}
-                <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/cbdab3df48a6ed83fbed770efe66791aef3b40d97e0756e4c369c3489f342a49?apiKey=f204040e98d84f33a858a3ebed299fa6&" class="login-logo" alt="Login Logo" />
-                <h2 class="login-title">Welcome Back!</h2>
-                <div class="form-group">
-                    <label for="email">E-mail Address</label>
-                    <input type="email" name="email" id="email" placeholder="name@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
-                </div>
-                <a href="#" class="forgot-password" id="forgot-password-link">Forgot Password?</a>
-
-                <button type="submit" class="login-button">Log In</button>
-                <p>Don't have an account? <a href="{% url 'sign' %}" class="signup-link">Sign Up</a></p>
-            </form>
-            <div class="divider">
-                <span>OR</span>
-            </div>
-            <div class="social-login">
-                <a href="{% provider_login_url 'google' %}"><button type="button" class="social-button google">
-                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/eba940891f493b77431ec4dd17aa1f836c8c3c94495552ca32f000d0873e139b?apiKey=f204040e98d84f33a858a3ebed299fa6&" alt="Google" class="social-icon" />
-                    Continue with Google
-                </button></a>
-                {% comment %} <a href="{% url 'social:begin' 'facebook'%}"><button type="button" class="social-button apple">
-                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/74b00f07d57119f20600db41429a1f54e40fbb7010bd974fac777d7db9206619?apiKey=f204040e98d84f33a858a3ebed299fa6&" alt="Apple" class="social-icon" />
-                    Continue with Apple
-                </button></a> {% endcomment %}
-                <a href="{% provider_login_url 'facebook' %}"><button type="button" class="social-button facebook">
-                    <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/1c00266ae103b0207d02306cb6aa9bf29bddf9ce85d9c251bae92586ba31d408?apiKey=f204040e98d84f33a858a3ebed299fa6&" alt="Facebook" class="social-icon" />
-                    Continue with Facebook
-                </button></a>
-            </div>
             
-        </div>
+                {% comment %} <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/cbdab3df48a6ed83fbed770efe66791aef3b40d97e0756e4c369c3489f342a49?apiKey=f204040e98d84f33a858a3ebed299fa6&" class="login-logo" alt="Login Logo" /> {% endcomment %}
+                <h2 class="login-title">Welcome Back!</h2>
+            
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        class="form-input" 
+                        placeholder="Enter your email" 
+                        required 
+                    />
+                </div>
+            
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            x-bind:type="showPassword ? 'text' : 'password'" 
+                            name="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="Enter your password" 
+                            required 
+                        />
+                        <button 
+                            type="button" 
+                            x-on:click="showPassword = !showPassword" 
+                            class="password-toggle" 
+                            x-text="showPassword ? 'Hide' : 'Show'" 
+                            aria-label="Toggle password visibility"
+                        ></button>
+                    </div>
+                </div>
+            
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input 
+                            type="checkbox" 
+                            id="remember" 
+                            x-model="rememberMe" 
+                            class="remember-checkbox" 
+                        />
+                        <label for="remember" class="remember-label">Remember me</label>
+                    </div>
+                    
+                    <a href="{% url 'password_reset' %}" class="forgot-password">Forgot password?</a>
+                </div>
+            
+                <button 
+                    type="submit" 
+                    class="signin-btn" 
+                    x-data="{ hover: false, isLoading: false }" 
+                    x-on:mouseenter="hover = true" 
+                    x-on:mouseleave="hover = false" 
+                    x-on:click="isLoading = true"
+                    x-bind:class="{ 'opacity-50 cursor-not-allowed': isLoading }"
+                    x-bind:style="{
+                        transform: hover ? 'translateY(-2px)' : 'translateY(0)',
+                        boxShadow: hover ? '0 16px 32px rgba(109,170,189,0.2)' : '0 8px 16px rgba(109,170,189,0.1)'
+                    }"
+                >
+                    <span x-show="!isLoading">Log In</span>
+                    <svg x-show="isLoading" class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            
+                <p style="text-align: center;">
+                  Don't have an account? <a href="{% url 'sign' %}" class="signup-link">Sign Up</a>
+              </p>
+              
+            </form>
+            
+          
+        </section> 
 
-    </div>
+        <section class="products-section hidden lg:block">
+          <div class="products-container">
+              <h2 class="products-title">Featured Products</h2>
+      
+              <div class="products-grid">
+                  {% for product in products %}
+                  <article
+                      class="product-card"
+                      x-data="{ hover: false }"
+                      x-on:mouseenter="hover = true"
+                      x-on:mouseleave="hover = false"
+                      x-bind:style="{
+                          transform: hover ? 'translateY(-4px)' : 'translateY(0)',
+                          boxShadow: hover ? '0 24px 48px rgba(0,0,0,0.08)' : '0 4px 8px rgba(0,0,0,0.04)'
+                      }"
+                  >
+                      <div class="product-image-container">
+                          {% if product.product_images.all %}
+                              <img
+                                  src="{{ product.product_images.first.image.url }}"
+                                  class="product-image"
+                                  alt="{{ product.product_name }}"
+                              />
+                          {% else %}
+                              <img
+                                  src="{% static 'default-image.jpg' %}"
+                                  class="product-image"
+                                  alt="No image"
+                              />
+                          {% endif %}
+                      </div>
+                      <h3 class="product-name">{{ product.product_name }}</h3>
+                      <p class="product-description">{{ product.product_description|truncatewords:5 }}</p>
 
+                      <p class="product-price">Rs{{ product.price }}</p>
+                  </article>
+                  {% endfor %}
+              </div>
+          </div>
+      </section>
+      
+      
+      </div>
+    </main>
     <script>
-      document.getElementById('forgot-password-link').addEventListener('click', function (event) {
-        event.preventDefault();
-        // Redirect to the password reset page
-        window.location.href = '/reset_password/';
-    });
-    
+
+
+
+          function redirectToGmail() {
+            setTimeout(function() {
+                window.open("https://mail.google.com/", "_blank");  // Open Gmail after login
+            }, 2000);  // Delay for better UX
+        }
+          
+
+
     </script>
-</body>
+  </body>
 </html>

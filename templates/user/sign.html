@@ -1,227 +1,931 @@
 {% load static %}
-<script src="{% static 'cart.js' %}"></script>
-<script src="{% static 'home.js' %}"></script>
-<link rel="stylesheet" href="{% static 'home.css' %}">
-<header class="header">
-  <a href="/" class="logo">@thediynight</a>
-  <nav class="nav">
-    <a href="/" class="nav-item">Shop</a>
-    <a href="/track" class="nav-item">Track</a>
-    <a href="/user" class="nav-item">User</a>
-  </nav>
-</header>
-<div class="signup-container">
-  <div class="signup-form">
-    <h2>Sign up Here</h2>
-    <form method="POST">
-      {% csrf_token %}
-      {% include "user/alert.html" %}
-      <div class="input-group">
-        <input type="text" id="first_name" name="first_name" required placeholder="First Name">
-      </div>
-      <div class="input-group">
-        <input type="text" id="last_name" name="last_name" required placeholder="Last Name">
-      </div>
-      <div class="input-group">
-        <input type="email" id="email" name="email" required placeholder="E-mail">
-      </div>
-      <div class="input-group">
-        <input type="password" id="password" name="password" required placeholder="Password">
-      </div>
-      <button type="submit" class="signup-button">Sign Up</button>
-    </form>
-    <p class="login-link">ALREADY HAVE AN ACCOUNT? <a href="/user_login">LOGIN HERE</a></p>
-  </div>
-  <div class="signup-image">
-    <div class="scroll-container">
-      <div class="scroll-track">
-        <img src="{% static 'product1.jpg' %}" alt="Product 1" class="scroll-item">
-        <img src="{% static 'product2.jpg' %}" alt="Product 2" class="scroll-item">
-        <img src="{% static 'product3.jpg' %}" alt="Product 3" class="scroll-item">
-        <img src="{% static 'product4.jpg' %}" alt="Product 4" class="scroll-item">
-        <img src="{% static 'product5.jpg' %}" alt="Product 5" class="scroll-item">
-        <img src="{% static 'product1.jpg' %}" alt="Product 1" class="scroll-item">
-        <img src="{% static 'product2.jpg' %}" alt="Product 2" class="scroll-item">
-        <img src="{% static 'product3.jpg' %}" alt="Product 3" class="scroll-item">
-        <img src="{% static 'product4.jpg' %}" alt="Product 4" class="scroll-item">
-        <img src="{% static 'product5.jpg' %}" alt="Product 5" class="scroll-item">
-      </div>
-    </div>
-    <div class="scroll-container reverse">
-      <div class="scroll-track">
-        <img src="{% static 'product6.jpg' %}" alt="Product 6" class="scroll-item">
-        <img src="{% static 'product7.jpg' %}" alt="Product 7" class="scroll-item">
-        <img src="{% static 'product8.jpg' %}" alt="Product 8" class="scroll-item">
-        <img src="{% static 'product9.jpg' %}" alt="Product 9" class="scroll-item">
-        <img src="{% static 'product10.jpg' %}" alt="Product 10" class="scroll-item">
-        <img src="{% static 'product6.jpg' %}" alt="Product 6" class="scroll-item">
-        <img src="{% static 'product7.jpg' %}" alt="Product 7" class="scroll-item">
-        <img src="{% static 'product8.jpg' %}" alt="Product 8" class="scroll-item">
-        <img src="{% static 'product9.jpg' %}" alt="Product 9" class="scroll-item">
-        <img src="{% static 'product10.jpg' %}" alt="Product 10" class="scroll-item">
-      </div>
-    </div>
-    <div class="scroll-container">
-      <div class="scroll-track">
-        <img src="{% static 'product11.jpg' %}" alt="Product 11" class="scroll-item">
-        <img src="{% static 'product12.jpg' %}" alt="Product 12" class="scroll-item">
-        <img src="{% static 'product13.jpg' %}" alt="Product 13" class="scroll-item">
-        <img src="{% static 'product14.jpg' %}" alt="Product 14" class="scroll-item">
-        <img src="{% static 'product15.jpg' %}" alt="Product 15" class="scroll-item">
-        <img src="{% static 'product11.jpg' %}" alt="Product 11" class="scroll-item">
-        <img src="{% static 'product12.jpg' %}" alt="Product 12" class="scroll-item">
-        <img src="{% static 'product13.jpg' %}" alt="Product 13" class="scroll-item">
-        <img src="{% static 'product14.jpg' %}" alt="Product 14" class="scroll-item">
-        <img src="{% static 'product15.jpg' %}" alt="Product 15" class="scroll-item">
-      </div>
-    </div>
-    <div class="promo-text">
-      <h3>Join Our Community</h3>
-      <p>Get exclusive deals and stay updated with the latest trends!</p>
-    </div>
-  </div>
-</div>
-<style>
-  body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create an Account</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #ffffff;
+}
+
+/* Main container */
+.page-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Product showcase section */
+.product-showcase {
+  width: 45%;
+  height: 100%;
+  background-color: #f8f9fa;
+  overflow: hidden;
+  position: relative;
+}
+
+.product-grid {
+  display: flex;
+  gap: 12px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 12px;
+}
+
+.product-column {
+  width: 33.333%;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mb-12 {
+  margin-bottom: 12px;
+}
+
+.product-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.product-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+}
+
+.product-title {
+  font-size: 14px;
+  color: #4a4a4a;
+  font-weight: 500;
+}
+
+/* Sign-up section */
+.signup-section {
+  width: 55%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  overflow-y: auto;
+}
+
+.signup-container {
+  width: 100%;
+  max-width: 440px;
+  padding: 32px;
+}
+
+.signup-header {
+  margin-bottom: 32px;
+}
+
+.signup-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #6daabd;
+  margin-bottom: 8px;
+}
+
+.signup-subtitle {
+  font-size: 15px;
+  color: #888;
+}
+
+/* Form styles */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.name-fields {
+  display: flex;
+  gap: 16px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a4a4a;
+}
+
+.form-input {
+  width: 100%;
+  height: 48px;
+  padding-left: 16px;
+  padding-right: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  font-size: 15px;
+  color: #4a4a4a;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #888;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.password-hint {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.terms-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.checkbox-input {
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  accent-color: #6daabd;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #888;
+}
+
+.text-link {
+  color: #6daabd;
+  text-decoration: none;
+}
+
+.submit-button {
+  width: 100%;
+  height: 48px;
+  background-color: #6daabd;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(109, 170, 189, 0.2);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+  background-color: #5c99ac;
+}
+
+.submit-button.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  height: 20px;
+  width: 20px;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-track {
+  opacity: 0.25;
+}
+
+.spinner-arrow {
+  opacity: 0.75;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
-  .header {
-    background-color: #56888b;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  to {
+    transform: rotate(360deg);
   }
-  .logo {
-    color: #fff;
-    font-size: 1.5rem;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  .nav {
-    display: flex;
-    gap: 1rem;
-  }
-  .nav-item {
-    color: #fff;
-    text-decoration: none;
-  }
-  .signup-container {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .signup-form {
-    background-color: #56888b;
-    border-radius: 12px;
-    padding: 2rem;
-    width: 50%;
-    color: #fff;
-  }
-  .signup-form h2 {
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-  }
-  .input-group {
-    margin-bottom: 1rem;
-  }
-  .input-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    background-color: #e3e3e3;
-  }
-  .signup-button {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    background-color: #40a3ce;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  .signup-button:hover {
-    background-color: #3590b5;
-  }
-  .login-link {
-    margin-top: 1rem;
-    text-align: center;
-  }
-  .login-link a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  .signup-image {
-    width: 50%;
-    display: flex;
+}
+
+.signup-footer {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.login-prompt {
+  font-size: 14px;
+  color: #888;
+}
+
+.login-link {
+  color: #6daabd;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Responsive styles */
+@media (max-width: 991px) {
+  .page-container {
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-left: 2rem;
-    overflow: hidden;
   }
-  .scroll-container {
+
+  .product-showcase {
     width: 100%;
-    height: 100px;
-    overflow: hidden;
-    margin-bottom: 1rem;
+    height: 40%;
   }
-  .scroll-track {
-    display: flex;
-    animation: scroll 30s linear infinite;
+
+  .signup-section {
+    width: 100%;
+    height: 60%;
   }
-  .scroll-container.reverse .scroll-track {
-    animation-direction: reverse;
+}
+
+@media (max-width: 640px) {
+  .product-grid {
+    gap: 8px;
+    padding: 8px;
   }
-  .scroll-item {
-    flex-shrink: 0;
-    width: 100px;
-    height: 100px;
-    margin-right: 1rem;
+
+  .product-list {
+    gap: 8px;
+  }
+
+  .product-caption {
+    padding: 8px;
+  }
+
+  .product-title {
+    font-size: 11px;
+  }
+
+  .signup-container {
+    padding: 16px;
+  }
+
+  .signup-header {
+    margin-bottom: 24px;
+  }
+
+  .signup-title {
+    font-size: 24px;
+  }
+
+  .signup-subtitle {
+    font-size: 14px;
+  }
+
+  .signup-form {
+    gap: 16px;
+  }
+
+  .name-fields {
+    flex-direction: column;
+  }
+
+  .form-input {
+    height: 44px;
+  }
+
+  .submit-button {
+    height: 44px;
+  }
+
+  .signup-footer {
+    margin-top: 24px;
+  }
+
+  .submit-button {
+    width: 100%;
+    height: 48px;
+    background-color: #6daabd;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
     border-radius: 8px;
-    object-fit: cover;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(109, 170, 189, 0.2);
+    cursor: pointer;
+    transition: background-color 0.2s;
   }
-  @keyframes scroll {
-    0% {
-      transform: translateX(0);
+  
+  .submit-button:hover {
+    background-color: #5c99ac;
+  }
+  
+  .submit-button.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .submit-button .spinner {
+    display: none;
+  }
+  
+  .submit-button.loading .spinner {
+    display: block;
+  }
+  
+  .spinner {
+    height: 20px;
+    width: 20px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
     }
-    100% {
-      transform: translateX(-100%);
+    to {
+      transform: rotate(360deg);
     }
   }
-  .promo-text {
-    text-align: center;
-    margin-top: 1rem;
+  .spinner {
+    animation: spin 1s linear infinite;
+    width: 24px;
+    height: 24px;
   }
-  .promo-text h3 {
-    color: #56888b;
-    margin-bottom: 0.5rem;
-  }
-  .promo-text p {
-    color: #333;
-  }
-  @media (max-width: 768px) {
-    .signup-container {
-      flex-direction: column;
-    }
-    .signup-form,
-    .signup-image {
-      width: 100%;
-      margin-left: 0;
-      margin-bottom: 2rem;
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
     }
   }
-</style>
+
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 4px;
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+
+
+
+  
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+@media (max-width: 1024px) {
+  .hide-on-small {
+    display: none;
+  }
+}
+
+@media (max-width: 991px) {
+  .signup-section {
+    width: 100%;
+    height: auto;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .signup-section {
+    width: 100%;
+    height: auto;
+    padding: 16px;
+  }
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  animation: scroll-up 20s linear infinite;
+}
+
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+
+
+
+.product-grid {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.product-column {
+  width: 32%; /* Makes each column take up about 1/3 of the space */
+  animation: move 5s linear infinite;
+}
+
+.product-column:nth-child(1) {
+  animation-duration: 4s; /* Faster */
+}
+
+.product-column:nth-child(2) {
+  animation-duration: 6s; /* Slower */
+}
+
+.product-column:nth-child(3) {
+  animation-duration: 5s; /* Medium speed */
+}
+
+
+.product-list {
+  margin-bottom: 12px;
+}
+
+
+{% comment %} .signup-section {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f5f5f5;  /* or a very light #6daabd shade */
+  background-image: url("{% static 'i.png' %}");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+} {% endcomment %}
+
+
+    </style>
+  </head>
+  <body>
+  <main class="page-container">
+    <section class="product-showcase hide-on-small">
+        <div class="product-grid">
+            <!-- First Product List -->
+            <div class="product-column">
+                <div class="product-list mb-12">
+                    {% for product in products %}
+                    <article class="product-card">
+                        {% if product.product_images.all %}
+                        <img
+                            src="{{ product.product_images.first.image.url }}"
+                            class="product-image"
+                            alt="{{ product.product_name }}"
+                        />
+                        {% else %}
+                        <img
+                            src="{% static 'default-image.jpg' %}"
+                            class="product-image"
+                            alt="No image"
+                        />
+                        {% endif %}
+                        <div class="product-caption">
+                            <p class="product-title">{{ product.product_name }}</p>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <!-- Second Product List -->
+            <div class="product-column">
+                <div class="product-list mb-12">
+                    {% for product in products %}
+                    <article class="product-card">
+                        {% if product.product_images.all %}
+                        <img
+                            src="{{ product.product_images.first.image.url }}"
+                            class="product-image"
+                            alt="{{ product.product_name }}"
+                        />
+                        {% else %}
+                        <img
+                            src="{% static 'default-image.jpg' %}"
+                            class="product-image"
+                            alt="No image"
+                        />
+                        {% endif %}
+                        <div class="product-caption">
+                            <p class="product-title">{{ product.product_name }}</p>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <!-- Third Product List -->
+            <div class="product-column">
+                <div class="product-list mb-12">
+                    {% for product in products %}
+                    <article class="product-card">
+                        {% if product.product_images.all %}
+                        <img
+                            src="{{ product.product_images.first.image.url }}"
+                            class="product-image"
+                            alt="{{ product.product_name }}"
+                        />
+                        {% else %}
+                        <img
+                            src="{% static 'default-image.jpg' %}"
+                            class="product-image"
+                            alt="No image"
+                        />
+                        {% endif %}
+                        <div class="product-caption">
+                            <p class="product-title">{{ product.product_name }}</p>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+           
+{% comment %}   
+      
+      <section class="signup-section" style="width: 100%; max-width: 600px; margin: 20px auto; padding: 20px;  border-radius: 8px;">
+        <div class="signup-container">
+          <header class="signup-header">
+            {% if messages %}
+            {% for message in messages %}
+                <div style="
+                    position: fixed;
+                    top: 30px;
+                    right: 30px;
+                    width: 300px;
+                    padding: 20px 25px;
+                    border-radius: 12px;
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+                    font-size: 16px;
+                    color: white;
+                    z-index: 9999;
+                    opacity: 0;
+                    animation: fadeInOut 5s forwards;
+                    background-color:
+                        {% if message.tags == 'success' or message.tags == 'info' or message.tags == 'warning' or message.tags == 'error' %}
+                            #6daabd
+                        {% else %}
+                            #6daabd
+                        {% endif %}
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        
+            <h1 class="signup-title">Create an account</h1>
+            <p class="signup-subtitle">
+              Join us and start shopping for your favorite items.
+            </p>
+          </header>
+      
+          <form class="signup-form" id="signupForm" method="POST" action="{% url 'sign' %}">
+            {% csrf_token %}
+      
+            <div class="name-fields">
+              <div class="form-group">
+                <label class="form-label" for="firstName">First name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="first_name"  
+                  placeholder="Enter first name"
+                  required
+                  class="form-input"
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="lastName">Last name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="last_name"  
+                  placeholder="Enter last name"
+                  required
+                  class="form-input"
+                />
+              </div>
+            </div>
+      
+            <div class="form-group">
+              <label class="form-label" for="email">Email address</label>
+              <input
+                type="email"
+                id="email"
+                name="email" 
+                placeholder="Enter your email"
+                required
+                class="form-input"
+              />
+            </div>
+      
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <div class="password-input-wrapper">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"  
+                  placeholder="Create a password"
+                  required
+                  class="form-input"
+                />
+                <button type="button" class="password-toggle" id="passwordToggle">
+                  <span id="passwordToggleText">Show</span>
+                </button>
+              </div>
+              <p class="password-hint">Must be at least 8 characters</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="confirmPassword">Confirm password</label>
+              <div class="password-input-wrapper">
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirm_password" 
+                  placeholder="Confirm your password"
+                  required
+                  class="form-input"
+                />
+                <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                  <span id="confirmPasswordToggleText">Show</span>
+                </button>
+                <div id="passwordError" class="error-message" style="color: red; display: none;"></div>
+
+              </div>
+            </div>
+            
+      
+         
+      
+           
+
+            <button type="submit" class="submit-button" id="submitButton" onclick="handleSubmit(event)">
+              <span id="submitText">Create account</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="spinner" id="spinner" style="display: none;">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="spinner-track"></circle>
+                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="spinner-arrow"></path>
+              </svg>
+            </button>
+            
+            
+            
+            
+            
+            
+      
+          <footer class="signup-footer">
+            <p class="login-prompt">
+              <span>Already have an account?</span>
+              <a href="/user_login" class="login-link">Login</a>
+            </p>
+          </footer>
+        </div>
+      </section>
+      
+    </main> {% endcomment %}
+    <section class="signup-section">
+      <div class="signup-container">
+        <header class="signup-header">
+          {% if messages %}
+            {% for message in messages %}
+              <div style="
+                  position: fixed;
+                  top: 30px;
+                  right: 30px;
+                  width: 300px;
+                  padding: 20px 25px;
+                  border-radius: 12px;
+                  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+                  font-size: 16px;
+                  color: white;
+                  z-index: 9999;
+                  opacity: 0;
+                  animation: fadeInOut 5s forwards;
+                  background-color: #6daabd;
+              ">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          
+          <h1 class="signup-title">Create an account</h1>
+          <p class="signup-subtitle">
+            Join us and start shopping for your favorite items.
+          </p>
+        </header>
+      
+        <form class="signup-form" id="signupForm" method="POST" action="{% url 'sign' %}">
+          {% csrf_token %}
+          <div class="name-fields">
+            <div class="form-group">
+              <label class="form-label" for="firstName">First name</label>
+              <input type="text" id="firstName" name="first_name" placeholder="Enter first name" required class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lastName">Last name</label>
+              <input type="text" id="lastName" name="last_name" placeholder="Enter last name" required class="form-input" />
+            </div>
+          </div>
+      
+          <div class="form-group">
+            <label class="form-label" for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required class="form-input" />
+          </div>
+      
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="password" name="password" placeholder="Create a password" required class="form-input" />
+              <button type="button" class="password-toggle" id="passwordToggle">
+                <span id="passwordToggleText">Show</span>
+              </button>
+            </div>
+            <p class="password-hint">Must be at least 8 characters</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword">Confirm password</label>
+            <div class="password-input-wrapper">
+              <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm your password" required class="form-input" />
+              <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                <span id="confirmPasswordToggleText">Show</span>
+              </button>
+              <div id="passwordError" class="error-message" style="color: red; display: none;"></div>
+            </div>
+          </div>
+    
+          <button type="submit" class="submit-button" id="submitButton" onclick="handleSubmit(event)">
+            <span id="submitText">Create account</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="spinner" id="spinner" style="display: none;">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="spinner-track"></circle>
+              <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="spinner-arrow"></path>
+            </svg>
+          </button>
+        </form>
+        
+        <footer class="signup-footer">
+          <p class="login-prompt">
+            <span>Already have an account?</span>
+            <a href="/user_login" class="login-link">Login</a>
+          </p>
+        </footer>
+      </div>
+    </section>
+    
+
+    <script>
+      const passwordToggle = document.getElementById("passwordToggle");
+      const passwordToggleText = document.getElementById("passwordToggleText");
+      const confirmPasswordToggle = document.getElementById("confirmPasswordToggle");
+      const confirmPasswordToggleText = document.getElementById("confirmPasswordToggleText");
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirmPassword");
+      
+      let state = {
+        showPassword: false,
+        showConfirmPassword: false
+      };
+    
+      // Toggle password visibility
+      passwordToggle.addEventListener("click", function () {
+        state.showPassword = !state.showPassword;
+        passwordInput.type = state.showPassword ? "text" : "password";
+        passwordToggleText.textContent = state.showPassword ? "Hide" : "Show";
+      });
+    
+      confirmPasswordToggle.addEventListener("click", function () {
+        state.showConfirmPassword = !state.showConfirmPassword;
+        confirmPasswordInput.type = state.showConfirmPassword ? "text" : "password";
+        confirmPasswordToggleText.textContent = state.showConfirmPassword ? "Hide" : "Show";
+      });
+    
+      // Form submission handler
+      document.getElementById("signupForm").addEventListener("submit", function(event) {
+        const password = passwordInput.value.trim();
+        const confirmPassword = confirmPasswordInput.value.trim();
+        const errorContainer = document.getElementById("passwordError");
+    
+        // Check password length
+        if (password.length < 8) {
+          event.preventDefault();
+          errorContainer.textContent = "Password must be at least 8 characters long.";
+          errorContainer.style.display = "block";
+          return;
+        }
+    
+        // Check if passwords match
+        if (password !== confirmPassword) {
+          event.preventDefault();
+          errorContainer.textContent = "Passwords do not match.";
+          errorContainer.style.display = "block";
+          return;
+        }
+    
+        // If all good, hide error and show spinner
+        errorContainer.textContent = "";
+        errorContainer.style.display = "none";
+        document.getElementById("submitText").style.display = 'none';
+        document.getElementById("spinner").style.display = 'inline-block';
+      });
+
+
+
+
+
+       // Shuffle function to randomize products
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
+      }
+      return arr;
+  }
+
+  // Get the product elements
+  window.onload = function () {
+      const productCards = Array.from(document.querySelectorAll('.product-card'));
+      const shuffledProducts = shuffleArray(productCards);
+
+      // Clear the columns
+      document.querySelectorAll('.product-list').forEach(list => list.innerHTML = '');
+
+      // Distribute the shuffled products across the three columns
+      const columns = document.querySelectorAll('.product-list');
+      shuffledProducts.forEach((productCard, index) => {
+          columns[index % columns.length].appendChild(productCard);
+      });
+  }
+    </script>
+    
+    
+  </body>
+</html>

@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include("accounts.urls")),
     path('',include("appname.urls")),
+ 
     path('accounts/', include('allauth.urls')),  # Include Allauth URLs
 
 ]

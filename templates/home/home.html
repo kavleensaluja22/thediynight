@@ -5,124 +5,373 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The DIY Night</title>
+    <link rel="icon" href="{% static 'path_to_your_favicon/favicon.ico' %}">
     <link href="http://b.io/ext_5-" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'home.css' %}">
-    <script src="{% static 'cart.js' %}"></script>
-    <script src="{% static 'home.js' %}"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+
+    <style>
+        /* BANNER STYLES */
+        .banner {
+            background-color: black;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            height: 40px;
+            position: relative;
+        }
+
+        .banner-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-left 15s linear infinite;
+            color: #6daabd;
+            font-size: 16px;
+            line-height: 40px;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .cart-modal { position: fixed; top: 0; right: 0; width: 350px; height: 100%; background: #fff; box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2); padding: 20px; overflow-y: auto; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .cart-item .quantity-controls { display: flex; align-items: center; }
+        .quantity-controls button { background: #ddd; border: none; padding: 5px 10px; margin: 0 5px; cursor: pointer; }
+
+        .cart-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            font-size: 14px;
+            z-index: 1000;
+        }
+        .logo {
+            display: block;
+            text-align: left;
+          }
+        
+          @media (max-width: 480px) {
+            .logo {
+              text-align: center;
+            }
+          }
+          
+
+          .category-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            flex-direction: row-reverse;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            padding: 10px 0;
+        }
+        
+        .category-grid::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-item {
+            flex: 0 0 auto;
+            text-align: center;
+            margin: 0 15px;
+            width: 150px; /* Fixed width to control layout, you can increase this too */
+            height: 170px; /* Added height to control the vertical size of each item */
+        }
+        
+        
+        .category-icon {
+            width: 120px;  /* increased width for larger image */
+            height: 150px;  /* increased height for vertical size */
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            margin: 0 auto 10px auto;
+        }
+        
+        .category-name {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6daabd;
+            background-color: #f0f8f8;
+            padding: 4px 8px;
+            border-radius: 8px;
+            margin-top: 5px;
+            word-wrap: break-word;
+        }
+        
+        
+
+        /* Default: Two products per row (for small and medium screens) */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns by default */
+    gap: 16px; /* Adjust the gap between products */
+}
+
+/* Large screens: Four products per row */
+@media (min-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(4, 1fr); /* Four columns on large screens */
+    }
+}
+
+
+.search-form {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.search-form input[type="text"] {
+    width: 300px;
+    padding: 10px;
+    border: 2px solid #6daabd;
+    border-radius: 8px 0 0 8px;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.search-form input[type="text"]:focus {
+    box-shadow: 0 0 5px rgba(109, 170, 189, 0.7);
+}
+
+.search-form button {
+    padding: 10px 20px;
+    background-color: #6daabd;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-form button:hover {
+    background-color: #5b96a1;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    justify-items: center;  /* To center the items inside the grid */
+}
+
+/* On mobile and medium screens (below 1024px), force 2x2 grid layout */
+@media (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: 1fr 1fr;  /* Two items per row */
+        grid-template-rows: 1fr 1fr; /* Two rows */
+        grid-gap: 15px; /* Spacing between items */
+    }
+}
+.product-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+.product-name {
+    font-size: 16px;
+    margin: 8px 0;
+    color: #333;
+}
+
+.product-details {
+    font-size: 14px;
+    color: #555;
+}
+
+          
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    justify-items: center; /* Center items inside the grid */
+}
+
+.product-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* Ensures content doesn't spill out of the card */
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-image {
+    position: relative;
+    width: 100%;
+    height: 200px; /* Set a fixed height for the image container */
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures image fills the container without distortion */
+    object-position: center; /* Centers the image within the container */
+}
+
+.product-name {
+    font-size: 16px;
+    margin: 8px 0;
+    color: #333;
+}
+
+.product-details {
+    font-size: 14px;
+    color: #555;
+}
+
+.product-rating {
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.star {
+    color: #ffbc00; /* Gold color for the stars */
+    font-size: 18px;
+    margin: 0 2px;
+}
+.price-and-rating {
+    display: flex;
+    align-items: center;  /* align vertically */
+    gap: 10px;  /* space between price and stars */
+}
+
+.product-price {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.product-rating .star {
+    font-size: 16px;
+    color: #f5c518;  /* gold color for stars */
+}
+
+{% comment %} .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+} {% endcomment %}
+
+/* For small and medium screens: force 2 columns */
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Optional: adjust for very small screens */
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.product-card {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+ 
+    </style>
 </head>
-<style>
-    #cart-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-    }
-    
-    .cart-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: white;
-        padding: 20px;
-        border-radius: 5px;
-        max-width: 80%;
-        max-height: 80%;
-        overflow-y: auto;
-    }
-    
-    .cart-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .cart-item-name {
-        flex: 1;
-    }
-    
-    .cart-item-controls {
-        display: flex;
-        align-items: center;
-    }
-    
-    .cart-quantity-btn {
-        background-color: #f0f0f0;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-    }
-    
-    .cart-item-quantity {
-        margin: 0 10px;
-    }
-    
-    .cart-item-price {
-        margin-left: 20px;
-    }
-    
-    .remove-item {
-        background-color: #ff4d4d;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-    }
-    
-    #cart-total {
-        font-weight: bold;
-        margin-top: 20px;
-    }
-    
-    #close-cart {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-    }
-</style>
-<body>
+
+<body data-page="home" data-user-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}">
+
+    <!-- TOP BANNER -->
+    <div class="banner">
+        <div class="banner-text">
+            Welcome to The DIY Night! &nbsp; | &nbsp; Free shipping on orders over Rs. 999! &nbsp; | &nbsp; Custom gifts for every occasion!
+        </div>
+    </div>
+
     <div class="container">
         <header class="header">
-            <a href="/" class="logo">@thediynight</a>
+          <div class="logo-container">
+  <a href="/" class="logo">@thediynight</a>
+</div>
+
+ <form method="GET" action="{% url 'search_products' %}" class="search-form">
+    <input type="text" name="query" placeholder="Search products..." value="{{ request.GET.query }}">
+    <button type="submit">Search</button>
+</form> 
+
+
             <nav class="nav">
                 <a href="/" class="nav-item">Shop</a>
-                <a href="/track" class="nav-item">Track</a>
-                <a href="/user" class="nav-item">User</a>
+                {% comment %} <a href="track" class="nav-item">Track</a> {% endcomment %}
+                <a href="/user/" class="nav-item">
+                    {% if request.user.is_authenticated %}
+                        {{ request.user.profile.name|default:request.user.username }}
+                    {% else %}
+                        User
+                    {% endif %}
+                </a>
                 <div class="cart-icon">
                     <button class="nav-item" id="cart-btn">Cart</button>
-                    <span class="cart-count" id="cart-count">0</span>
+                    <span class="cart-count" id="cart-count">{{ cart_count }}</span>
                 </div>
             </nav>
         </header>
-        <main class="main-content">
-            <form class="search-bar">
-                <input type="text" class="search-input" placeholder="Search products" aria-label="Search products">
-                <button type="submit" class="search-button" aria-label="Submit search">Search</button>
-            </form>
 
-            
+        <main class="main-content">
             <section class="category-section">
                 <h2 class="category-title">Browse Categories</h2>
+                
                 <div class="category-grid">
                     {% for category in categories %}
                     <a href="{% url 'category_detail' category.slug %}" class="category-item">
-                        <div class="category-icon" style="background-image: url('{% if category.category_image %}{{ category.category_image.url }}{% else %}/path/to/default/image.jpg{% endif %}');"></div>
-                        <span class="category-name">{{ category.category_name }}</span>
+                        <div class="category-icon" style="
+                            background-image: url('{% if category.category_image %}{{ category.category_image.url }}{% else %}/path/to/default/image.jpg{% endif %}');
+                        "></div>
+                        <span class="category-name">
+                            {{ category.category_name }}
+                        </span>
                     </a>
                     {% endfor %}
                 </div>
+                
+            
             </section>
+
             <div class="product-grid" id="product-grid">
                 {% for product in products %}
                 <article class="product-card">
@@ -137,34 +386,30 @@
                     </div>
                     <h3 class="product-name">{{ product.product_name }}</h3>
                     <div class="product-details">
-                        <span class="product-price">Rs.{{ product.price }}</span>
-                        <div class="product-rating">
-                            <span class="rating-stars" data-rating="4.5" data-product="{{ product.product_name }}">★★★★☆</span>
-                            <span class="rating-value">4.5</span>
+                        <div class="price-and-rating">
+                            <span class="product-price">Rs. {{ product.price }}</span>
+                            <div class="product-rating">
+                                {% for i in product.star_rating_filled %}
+                                    <span class="star">&#9733;</span>  <!-- Filled Star -->
+                                {% endfor %}
+                                {% for i in product.star_rating_empty %}
+                                    <span class="star">&#9734;</span>  <!-- Empty Star -->
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
-                    <div class="quantity-control">
-                        <button class="quantity-btn minus" data-product="{{ product.product_name }}">-</button>
-                        <span class="quantity" data-product="{{ product.product_name }}">1</span>
-                        <button class="quantity-btn plus" data-product="{{ product.product_name }}">+</button>
-                    </div>
-                    <button class="add-to-cart" data-product="{{ product.product_name }}" data-price="{{ product.price }}">Add to Cart</button>
                 </article>
                 {% endfor %}
             </div>
+            
         </main>
-        <div class="slogan">Unleash your creativity with The DIY Night!</div>
-    </div>
-    <div class="cart-modal" id="cart-modal">
-        <div class="cart-modal-content">
-            <div class="cart-header">
-                <h2>Your Cart</h2>
-                <button class="close-modal" id="close-cart">&times;</button>
-            </div>
-            <div class="cart-items" id="cart-items"></div>
-            <div class="cart-total">Total: <span id="cart-total">Rs.0</span></div>
-            <button class="checkout-btn">Proceed to Checkout</button>
-        </div>
-    </div>
+
+    <script>
+        document.getElementById('cart-btn').addEventListener('click', () => {
+            window.location.href = "/cart/";
+        });
+
+        
+    </script>
 </body>
 </html>

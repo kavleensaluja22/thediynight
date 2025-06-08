@@ -1,0 +1,12 @@
+{% comment %} <form method="POST">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Your name">
+    <input type="email" name="email" placeholder="Your email">
+
+    {% for field in product.customization_fields.all %}
+        <label>{{ field.label }}</label>
+        <input type="text" name="custom_{{ field.id }}">
+    {% endfor %}
+
+    <button type="submit">Place Order</button>
+</form> {% endcomment %}

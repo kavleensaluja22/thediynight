@@ -1,315 +1,176 @@
 {% load static %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Detail Page</title>
+    {% load static %}
     <link rel="stylesheet" href="{% static 'prodd.css' %}">
-    <script src="{% static 'cart.js' %}"></script>
-    <script src="{% static 'home.js' %}"></script>
     <style>
-        #success-message {
+        /* Overlay Background */
+        .cart-overlay {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #ffffff;
-            color: #28a745;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            display: none;
-            z-index: 9999;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            max-width: 300px;
-            width: 90%;
-        }
-        #success-message.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        #success-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-        #success-text {
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-        #success-close {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        #success-close:hover {
-            background-color: #218838;
-        }
-        @media (max-width: 768px) {
-            #success-message {
-                padding: 15px 20px;
-            }
-            #success-icon {
-                font-size: 36px;
-            }
-            #success-text {
-                font-size: 16px;
-            }
-            #success-close {
-                padding: 8px 16px;
-                font-size: 14px;
-            }
-        }
-        .cart-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .cart-modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            max-width: 600px;
-        }
-        .close-modal {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-modal:hover,
-        .close-modal:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .customer-reviews {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            font-family: 'Arial', sans-serif;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
         }
         
-        .reviews-title {
-            font-size: 28px;
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .review-form {
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 40px;
-        }
-        
-        .star-rating-container {
-            margin-bottom: 20px;
-        }
-        
-        .rating-label {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #555;
-        }
-        
-        .star-rating {
+        /* Modal Container */
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
             display: flex;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
         }
         
-        .star-rating input {
-            display: none;
+        .cart-modal.active {
+            transform: translateX(0);
         }
         
-        .star-rating label {
-            cursor: pointer;
-            width: 30px;
-            height: 30px;
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="%23ddd"/></svg>');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 76%;
-            transition: .3s;
-        }
-        
-        .star-rating input:checked ~ label,
-        .star-rating label:hover,
-        .star-rating label:hover ~ label {
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="%23ffd700"/></svg>');
-        }
-        
-        .review-text-container {
-            margin-bottom: 20px;
-        }
-        
-        .review-text {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: vertical;
-            font-size: 16px;
-        }
-        
-        .media-upload-container {
-            margin-bottom: 20px;
-        }
-        
-        .media-label {
-            display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .media-label:hover {
-            background-color: #0056b3;
-        }
-        
-        .media-icon {
-            margin-right: 5px;
-        }
-        
-        .review-media {
-            display: none;
-        }
-        
-        .media-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .media-preview img,
-        .media-preview video {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-        
-        .submit-review {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .submit-review:hover {
-            background-color: #218838;
-        }
-        
-        .login-prompt {
-            text-align: center;
-            background-color: #f9f9f9;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .login-prompt p {
-            margin-bottom: 15px;
-            font-size: 18px;
-            color: #555;
-        }
-        
-        .login-link {
-            display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        
-        .login-link:hover {
-            background-color: #0056b3;
-        }
-        
-        .reviews-list {
-            margin-top: 40px;
-        }
-        
-        .review-item {
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .review-header {
+        /* Modal Header */
+        .cart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
         }
         
-        .review-author {
+        .cart-header h2 {
+            font-size: 1.5rem;
             font-weight: bold;
             color: #333;
         }
         
-        .review-date {
-            color: #777;
-            font-size: 14px;
+        .close-modal {
+            font-size: 1.2rem;
+            color: #333;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s;
         }
         
-        .review-rating {
-            color: #ffd700;
-            font-size: 20px;
-            margin-bottom: 10px;
+        .close-modal:hover {
+            color: #ff5a5a;
         }
         
-        .review-content {
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 15px;
+        /* Cart Items */
+        .cart-items {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
         }
         
-        .review-media {
+        .cart-item {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .item-price {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .item-quantity {
+            color: #777;
+            font-size: 0.8rem;
+        }
+        
+        /* Cart Footer */
+        .cart-footer {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
             gap: 10px;
         }
         
-        .review-media img,
-        .review-media video {
-            max-width: 150px;
-            max-height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
+        .cart-total {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
         }
+        
+        .checkout-btn {
+            padding: 10px 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .checkout-btn:hover {
+            background: #218838;
+        }
+        /* Default styling for small screens (center the logo) */
+        .logo {
+          display: block;
+          text-align: center;
+          margin: 0 auto;
+          font-size: 2rem; /* Adjust the font size as needed */
+        }
+        
+        /* For larger screens (laptops and tablets) - align logo to the left */
+        @media (min-width: 768px) {
+          .logo {
+            text-align: left;
+            margin: 0; /* Ensure no extra margin on the left */
+          }
+        }
+        
+
+        .color-option.selected, .size-option.selected {
+            border: 2px solid #000;
+            background-color: #ddd;
+        }
+        
+        .cart-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+        }
+    
+
+        /* Cart Modal Overlay with Blurry Background */
         #cart-modal {
             display: none;
             position: fixed;
@@ -317,130 +178,419 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px); /* Blurry background */
+            background: rgba(0, 0, 0, 0.4); /* Dark overlay */
             z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none; /* Hide the cart modal by default */
         }
         
-        .cart-content {
+        /* Cart Box (Wider & Rounded Square Borders) */
+        .cart-box {
+            background: white;
+            width: 95%;
+            max-width: 500px; /* Increased horizontal width */
+            padding: 25px;
+            border-radius: 12px; /* Rounded square corners */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            text-align: center;
+            max-height: 85vh;
+            overflow-y: auto; /* Scroll if too many items */
+        }
+        
+        /* Close Button */
+        #close-cart {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            max-width: 80%;
-            max-height: 80%;
-            overflow-y: auto;
+            top: 12px;
+            right: 12px;
+            background: #0077b6; /* Turtle blue */
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 8px; /* Rounded square */
+            transition: 0.3s ease-in-out;
         }
         
+        #close-cart:hover {
+            background: #005f87;
+        }
+        
+        /* Cart Items List */
+        #cart-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        /* Individual Cart Item */
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
         }
         
-        .cart-item-name {
-            flex: 1;
-        }
-        
-        .cart-item-controls {
+        /* Quantity Controls */
+        .quantity-controls {
             display: flex;
             align-items: center;
         }
         
-        .cart-quantity-btn {
-            background-color: #f0f0f0;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        
-        .cart-item-quantity {
-            margin: 0 10px;
-        }
-        
-        .cart-item-price {
-            margin-left: 20px;
-        }
-        
-        .remove-item {
-            background-color: #ff4d4d;
+        .quantity-controls button {
+            background: #0077b6; /* Turtle blue */
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 8px 14px;
             cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+            border-radius: 8px; /* Rounded square */
+            transition: 0.3s;
         }
         
-        #cart-total {
-            font-weight: bold;
-            margin-top: 20px;
+        .quantity-controls button:hover {
+            background: #005f87;
         }
         
-        #close-cart {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
+        /* Remove Item Button */
+        .remove-item {
+            background: red;
+            color: white;
             border: none;
-            font-size: 20px;
+            padding: 8px 12px;
             cursor: pointer;
+            border-radius: 8px; /* Rounded square */
+            transition: 0.3s;
         }
+        
+        .remove-item:hover {
+            background: darkred;
+        }
+        
+        /* Cart Total Price */
+        #cart-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0077b6;
+            margin-top: 15px;
+        }
+        
+        /* Checkout Button */
+        .checkout-btn {
+            background: #0077b6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 8px; /* Rounded square */
+            font-size: 16px;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        
+        .checkout-btn:hover {
+            background: #005f87;
+        }
+        
+        .review-media {
+            max-width: 100%;
+            max-height: 80px; /* Set a maximum height */
+            height: auto;
+            display: block;
+            margin-top: 10px;
+        }
+        
+        .media-preview-item {
+            width: 80px;  /* Set a fixed width */
+            height: 80px; /* Set a fixed height */
+            object-fit: contain; /* Ensures the image maintains aspect ratio without cropping */
+            display: block;
+        }
+        .delete-review {
+            background-color: #6daabd;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+            transition: background-color 0.3s ease, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .delete-review:hover {
+            background-color: #5b94a1;
+            transform: scale(1.05);
+        }
+        
+        .delete-review::before {
+            content: "🗑";
+            font-size: 16px;
+        }
+        
+
+
+
+
+        .similar-products-container {
+            display: flex;
+            gap: 20px; /* Space between products */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            scroll-snap-type: x mandatory; /* Smooth snapping */
+            padding: 10px 0;
+            white-space: nowrap;
+        }
+        
+        .similar-products-container::-webkit-scrollbar {
+            height: 8px; /* Scrollbar height */
+        }
+        
+        .similar-products-container::-webkit-scrollbar-thumb {
+            background-color: #6daabd; /* Custom scrollbar color */
+            border-radius: 10px;
+        }
+        
+        .similar-products-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .product-card-link {
+            flex: 0 0 auto;
+            scroll-snap-align: start; /* Ensure smooth scrolling */
+            text-decoration: none;
+        }
+        
+        .product-card {
+            width: 200px; /* Set a fixed width for each product */
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            background: white;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .product-card:hover {
+            transform: scale(1.05); /* Slight zoom effect on hover */
+        }
+        
+        .product-image-small {
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+        .product-card-info {
+            text-align: center;
+            margin-top: 8px;
+        }
+        
+        .product-name-small {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .product-price-small {
+            font-size: 14px;
+            color: #6daabd;
+        }
+        
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .rating-icon {
+            color: gold;
+        }
+        
+        .cart-icon-small {
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+
+.color-option.active,
+.size-option.active {
+    border: 2px solid #6daabd;
+    background-color: #f0f0f0;
+}
+
+        
     </style>
+    <!-- Removed JavaScript from the head for better performance -->
 </head>
-<body>
+<body data-page="product">
     <div class="container">
         <header class="header">
             <a href="/" class="logo">@thediynight</a>
             <nav class="nav">
                 <a href="/" class="nav-item">Shop</a>
-                <a href="/track" class="nav-item">Track</a>
-                <a href="/user" class="nav-item">User</a>
+                <a href="/user/" class="nav-item">
+                    {% if request.user.is_authenticated %}
+                        {{ request.user.profile.name|default:request.user.username }}
+                    {% else %}
+                        User
+                    {% endif %}
+                </a>
+        
                 <div class="cart-icon">
                     <button class="nav-item" id="cart-btn">Cart</button>
+
+
+           
                     <span class="cart-count" id="cart-count">0</span>
                 </div>
             </nav>
         </header>
+        
         <main class="main-content">
             <section class="product-container">
                 <div class="product-images">
                     <img src="{{ product.product_images.first.image.url }}" alt="{{ product.product_name }}" class="product-image" id="main-image">
+                    
                     {% for image in product.product_images.all|slice:"1:4" %}
                         <img src="{{ image.image.url }}" alt="{{ product.product_name }}" class="additional-image" onclick="changeMainImage(this.src)">
+                        
                     {% endfor %}
+                    
                 </div>
+        
                 <div class="product-info">
+                    {% if seller_name %}
+                    <p style="
+                        font-size: 15px;
+                        margin-top: 12px;
+                        color: white;
+                        font-weight: 600;
+                        background-color: #6daabd;
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        display: inline-block;
+                        box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+                        letter-spacing: 0.5px;
+                    ">
+                        🛍️ Seller: {{ seller_name }}
+                    </p>
+                {% endif %}
+                
+                
                     <h1 class="product-name">{{ product.product_name }}</h1>
-                    <p class="product-price" id="product-price" data-base-price="{{ product.price }}">Rs. {{ product.price }}</p>
+                    <style>
+                        .angled-id {
+                            position: relative;
+                            display: inline-block;
+                            padding: 10px 22px;
+                            background: #6daabd;
+                            color: #fff;
+                            font-size: 13px;
+                            font-weight: 700;
+                            margin-top: 16px;
+                            transform: skew(-20deg);
+                            box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15);
+                            letter-spacing: 0.8px;
+                            border-left: 4px solid #3e7e91;
+                            border-radius: 6px;
+                        }
+                    
+                        .angled-id span {
+                            display: inline-block;
+                            transform: skew(20deg);
+                        }
+                    </style>
+                    
+                    <p class="angled-id">
+                        <span>🆔 Product ID: {{ product.uid|stringformat:"s"|slice:":8" }}</span>
+                    </p>
+                    
+                    
+                    
+                
+                    <p class="product-price" id="product-price" data-base-price="{{ product.price }}">
+                        Rs. {{ product.price }}
+                    </p>
                     <p class="product-description">{{ product.product_description }}</p>
+                    
+                    <!-- New lines to display product ID and Seller Info -->
+                  
+                   
+                    
                     <div class="product-options">
                         <div>
                             <p class="option-label">Color:</p>
                             {% for color_variant in product.color_variants.all %}
-                                <button class="color-option" data-color="{{ color_variant.color_name }}" data-price="{{ color_variant.price }}" onclick="selectColor(this)">{{ color_variant.color_name }}</button>
+                                <button class="color-option" 
+                                        data-color-id="{{ color_variant.id }}" 
+                                        data-price="{{ color_variant.price }}">
+                                    {{ color_variant.color_name }}
+                                </button>
                             {% endfor %}
                         </div>
+        
                         <div>
                             <p class="option-label">Size:</p>
                             {% for size_variant in product.size_variants.all %}
-                                <button class="size-option" data-size="{{ size_variant.size_name }}" data-price="{{ size_variant.price }}" onclick="selectSize(this)">{{ size_variant.size_name }}</button>
+                                <button class="size-option" 
+                                        data-size-id="{{ size_variant.id }}" 
+                                        data-price="{{ size_variant.price }}">
+                                    {{ size_variant.size_name }}
+                                </button>
                             {% endfor %}
                         </div>
                     </div>
+        
                     <div class="quantity-control">
-                        <button class="quantity-button" onclick="decreaseQuantity()">-</button>
-                        <span class="quantity-display" id="quantity-display">1</span>
-                        <button class="quantity-button" onclick="increaseQuantity()">+</button>
+                        <button id="decrease-quantity" class="quantity-button">-</button>
+                        <span id="quantity-display" class="quantity" data-product="{{ product.uid }}">1</span>
+                        <button id="increase-quantity" class="quantity-button">+</button>
                     </div>
-                    <button class="add-to-cart" onclick="addToCart('{{ product.product_name }}', {{ product.price }})">
+                    <button 
+                    style="
+                        background-color: #f4c430; /* A warm yellow shade */
+                        color: #000;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 12px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        margin-top: 10px;
+                    "
+                    onclick="showCartNotification()"
+                >
+                    Send coustmization details on {% if seller_phone %}
+                    <p class="seller-phone">Phone: {{ seller_phone }}</p>
+                {% endif %} with your Product-id and Email Address
+                </button>
+                    <button class="add-to-cart" 
+                            id="add-to-cart-btn"
+                            data-product="{{ product.uid }}" 
+                            data-name="{{ product.product_name }}" 
+                            data-price="{{ product.price }}">
                         Add to Cart
                     </button>
                 </div>
             </section>
+        
+            <!-- Cart popup/modal area -->
+            {% comment %} <section class="cart-area" id="cart-area" style="display: none;">
+                <div id="cart-items"></div>
+                <div id="cart-total">Total: Rs. 0</div>
+            </section> {% endcomment %}
+        
+            <div id="cart-notification" style="display: none;">Item added to cart!</div>
+     
+        </main>
+        
             <section class="related-products">
                 <h2>Related Products</h2>
                 <div class="similar-products-container">
@@ -451,13 +601,15 @@
                                 <div class="product-card-info">
                                     <h3 class="product-name-small">{{ similar_product.product_name }}</h3>
                                     <p class="product-price-small">Rs. {{ similar_product.price }}</p>
-                                    <div class="product-details">
-                                        <div class="product-rating">
-                                            <span class="rating-icon">★★★★☆</span>
-                                            <span>4.2</span>
-                                        </div>
-                                        <span class="cart-icon-small" onclick="addToCart('{{ similar_product.product_name }}', {{ similar_product.price }})">🛒</span>
+                                    <div class="product-details" style="display: flex; justify-content: center; align-items: center;">
+                                        <span class="cart-icon-small add-to-cart" 
+                                            data-product="{{ similar_product.uid }}" 
+                                            data-price="{{ similar_product.price }}" 
+                                            data-name="{{ similar_product.product_name }}">
+                                            🛒
+                                        </span>
                                     </div>
+                                    
                                 </div>
                             </article>
                         </a>
@@ -495,12 +647,9 @@
                         <div class="media-upload-container">
                             <label for="reviewMedia" class="media-label">
                                 <span class="media-icon" aria-hidden="true">📷</span>
-                                Add Photos or Videos
-                                <!-- File Input inside the Label -->
-                                <input type="file" id="reviewMedia" class="review-media" name="media" accept="image/*,video/*" aria-label="Upload media" multiple>
+                                Add Photo
+                                <input type="file" id="reviewMedia" class="review-media" name="media" accept="image/*" aria-label="Upload media" multiple>
                             </label>
-                            
-                            <!-- Media preview container for both images and videos -->
                             <div id="mediaPreview" class="media-preview" aria-live="polite"></div>
                         </div>
                         <input type="hidden" name="product_id" value="{{ product.uid }}">
@@ -509,341 +658,304 @@
                 {% else %}
                     <div class="login-prompt">
                         <p>Want to share your thoughts?</p>
-                        <a href="{% url 'login' %}" class="login-link">Log in to write a review</a>
+                        <a href="{% url 'user_login' %}" class="login-link">Log in to write a review</a>
                     </div>
                 {% endif %}
                 <div class="reviews-list" id="reviewsList"></div>
+
+                
             </section>
         </main>
     </div>
-    <div id="cartModal" class="cart-modal">
-        <div class="cart-modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Your Cart</h2>
-            <div id="cart-items"></div>
-            <p id="cart-total">Rs. 0.00</p>
-            <a href="{% url 'checkout' %}" class="cart-checkout">Checkout</a>
-        </div>
-    </div>
-    <div id="success-message">
-        <div id="success-icon">✓</div>
-        <p id="success-text">Product added to cart successfully!</p>
-        <button id="success-close" onclick="closeSuccessMessage()">Close</button>
-    </div>
-    <script>
-        function isValidCartItem(item) {
-            return item && typeof item.quantity === 'number' && item.quantity > 0;
-        }
-        function getCurrentQuantity() {
-            const quantityDisplay = document.getElementById('quantity-display');
-            if (!quantityDisplay || isNaN(parseInt(quantityDisplay.textContent, 10))) {
-                console.error("Quantity display element is missing or not a valid number");
-                return 1;
-            }
-            return parseInt(quantityDisplay.textContent, 10);
-        }
-        function addToCart(productName, price = 0) {
-            const quantity = getCurrentQuantity();
-            if (isNaN(quantity) || quantity <= 0) {
-                console.error("Invalid quantity for product:", quantity);
-                return;
-            }
-            let cart = JSON.parse(localStorage.getItem('cart')) || {};
-            const cartKey = `${productName}|${price}`;
-            if (!cartKey || quantity <= 0) {
-                console.warn("Invalid cart item data:", { cartKey, quantity });
-                return;
-            }
-            if (!cart[cartKey]) {
-                cart[cartKey] = {
-                    name: productName,
-                    quantity: quantity,
-                    price: price
-                };
-            } else {
-                cart[cartKey].quantity += quantity;
-            }
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartDisplay();
-            showAddToCartSuccessMessage(productName);
-        }
-        function updateCartDisplay() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || {};
-            let totalItems = 0;
-            for (const cartKey in cart) {
-                const item = cart[cartKey];
-                if (isValidCartItem(item)) {
-                    totalItems += item.quantity;
-                } else {
-                    console.warn("Invalid cart item encountered while updating count", item);
-                }
-            }
-            const cartCountElement = document.getElementById('cart-count');
-            if (cartCountElement) {
-                cartCountElement.innerText = totalItems;
-            }
-        }
-        function showAddToCartSuccessMessage(productName) {
-            const successMessage = document.getElementById('success-message');
-            const successText = document.getElementById('success-text');
-            if (successMessage && successText) {
-                successText.textContent = `${productName} added to cart successfully!`;
-                successMessage.style.display = 'block';
-                successMessage.style.opacity = '1';
-                successMessage.style.transform = 'translate(-50%, -50%) scale(1)';
-                setTimeout(() => {
-                    closeSuccessMessage();
-                }, 3000);
-            }
-        }
-        function closeSuccessMessage() {
-            const successMessage = document.getElementById('success-message');
-            if (successMessage) {
-                successMessage.style.opacity = '0';
-                successMessage.style.transform = 'translate(-50%, -50%) scale(0.9)';
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 300);
-            }
-        }
-        function increaseQuantity() {
-            const quantityDisplay = document.getElementById('quantity-display');
-            if (quantityDisplay) {
-                let currentQuantity = parseInt(quantityDisplay.textContent, 10);
-                quantityDisplay.textContent = currentQuantity + 1;
-            }
-        }
-        function decreaseQuantity() {
-            const quantityDisplay = document.getElementById('quantity-display');
-            if (quantityDisplay) {
-                let currentQuantity = parseInt(quantityDisplay.textContent, 10);
-                if (currentQuantity > 1) {
-                    quantityDisplay.textContent = currentQuantity - 1;
-                }
-            }
-        }
-        function changeMainImage(src) {
-            const mainImage = document.getElementById('main-image');
-            if (mainImage) {
-                mainImage.src = src;
-            }
-        }
-        function selectColor(button) {
-            const colorButtons = document.querySelectorAll('.color-option');
-            colorButtons.forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
-            updatePrice();
-        }
-        function selectSize(button) {
-            const sizeButtons = document.querySelectorAll('.size-option');
-            sizeButtons.forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
-            updatePrice();
-        }
-        function updatePrice() {
-            const productPriceElement = document.getElementById('product-price');
-            if (productPriceElement) {
-                const basePrice = parseFloat(productPriceElement.dataset.basePrice) || 0;
-                const selectedColor = document.querySelector('.color-option.selected');
-                const selectedSize = document.querySelector('.size-option.selected');
-                let newPrice = basePrice;
-                if (selectedColor) {
-                    newPrice += parseFloat(selectedColor.dataset.price) || 0;
-                }
-                if (selectedSize) {
-                    newPrice += parseFloat(selectedSize.dataset.price) || 0;
-                }
-                productPriceElement.textContent = `Rs. ${newPrice.toFixed(2)}`;
-            }
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCartDisplay();
-            const cartBtn = document.getElementById('cart-btn');
-            const cartModal = document.getElementById('cartModal');
-            const closeModal = document.querySelector('.close-modal');
-            cartBtn.addEventListener('click', function() {
-                cartModal.style.display = 'block';
-                updateCartModalContent();
-            });
-            closeModal.addEventListener('click', function() {
-                cartModal.style.display = 'none';
-            });
-            window.addEventListener('click', function(event) {
-                if (event.target === cartModal) {
-                    cartModal.style.display = 'none';
-                }
+
+
+
+
+
+<div id="cart-items"></div>
+<div id="cart-total"></div>
+<span id="cart-count"></span>
+<div id="cart-notification" style="display:none;">Item added to cart!</div>
+
+  
+<script>
+
+    let cart = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        await loadCartFromBackend();
+        updateCartCount();
+    
+        document.getElementById("increase-quantity").addEventListener("click", () => updateQuantity(1));
+        document.getElementById("decrease-quantity").addEventListener("click", () => updateQuantity(-1));
+    
+        document.querySelectorAll(".color-option").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".color-option").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                updateVariantPrice();
             });
         });
-        function updateCartModalContent() {
-            const cartItemsContainer = document.getElementById('cart-items');
-            const cartTotalElement = document.getElementById('cart-total');
-            const cart = JSON.parse(localStorage.getItem('cart')) || {};
-            let cartHTML = '';
-            let total = 0;
-            for (const cartKey in cart) {
-                const item = cart[cartKey];
-                if (isValidCartItem(item)) {
-                    const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
-                    cartHTML += `
-                        <div class="cart-item">
-                            <span>${item.name}</span>
-                            <span>Quantity: ${item.quantity}</span>
-                            <span>Price: Rs. ${item.price.toFixed(2)}</span>
-                            <span>Total: Rs. ${itemTotal.toFixed(2)}</span>
-                        </div>
-                    `;
-                }
+    
+        document.querySelectorAll(".size-option").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".size-option").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                updateVariantPrice();
+            });
+        });
+    
+        document.getElementById("add-to-cart-btn").addEventListener("click", function () {
+            const productID = this.dataset.product;
+            const name = this.dataset.name;
+            const quantity = parseInt(document.getElementById("quantity-display").textContent);
+    
+            const selectedSizeBtn = document.querySelector(".size-option.active");
+            const selectedColorBtn = document.querySelector(".color-option.active");
+    
+            const selectedSize = selectedSizeBtn ? selectedSizeBtn.textContent.trim() : null;
+            const selectedColor = selectedColorBtn ? selectedColorBtn.textContent.trim() : null;
+    
+            const basePrice = parseFloat(document.getElementById("product-price").dataset.basePrice || 0);
+            const sizePrice = selectedSizeBtn ? parseFloat(selectedSizeBtn.dataset.price || 0) : 0;
+            const colorPrice = selectedColorBtn ? parseFloat(selectedColorBtn.dataset.price || 0) : 0;
+    
+            const finalPrice = (basePrice + sizePrice + colorPrice) * quantity;
+    
+            const imageUrl = document.getElementById("main-image").src;
+    
+            fetch("/save-cart/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(),
+                },
+                body: JSON.stringify({
+                    id: productID,
+                    name: name,
+                    price: finalPrice,
+                    quantity: quantity,
+                    selected_size: selectedSize,
+                    selected_color: selectedColor,
+                    image: imageUrl,
+                }),
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                alert(data.message || "Added to cart!");
+                loadCartFromBackend().then(updateCartCount);
+            })
+            .catch(error => {
+                console.error("Add to cart error:", error);
+            });
+        });
+    });
+    
+    function updateQuantity(change) {
+        const quantityDisplay = document.getElementById("quantity-display");
+        let quantity = parseInt(quantityDisplay.textContent);
+        quantity = Math.max(1, quantity + change);
+        quantityDisplay.textContent = quantity;
+        updateVariantPrice(); // Optional: update total if needed
+    }
+    
+    function updateVariantPrice() {
+        const basePrice = parseFloat(document.getElementById("product-price").dataset.basePrice || 0);
+    
+        const selectedSizeBtn = document.querySelector(".size-option.active");
+        const selectedColorBtn = document.querySelector(".color-option.active");
+    
+        const sizePrice = selectedSizeBtn ? parseFloat(selectedSizeBtn.dataset.price || 0) : 0;
+        const colorPrice = selectedColorBtn ? parseFloat(selectedColorBtn.dataset.price || 0) : 0;
+    
+        const finalPrice = basePrice + sizePrice + colorPrice;
+    
+        const productPriceEl = document.getElementById("product-price");
+        productPriceEl.textContent = `Rs. ${finalPrice}`;
+    }
+    
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const cookies = document.cookie.split(";");
+        for (const cookie of cookies) {
+            const trimmed = cookie.trim();
+            if (trimmed.startsWith(name + "=")) {
+                return decodeURIComponent(trimmed.substring(name.length + 1));
             }
-            cartItemsContainer.innerHTML = cartHTML;
-            cartTotalElement.textContent = `Total: Rs. ${total.toFixed(2)}`;
         }
-        document.addEventListener('DOMContentLoaded', function() {
-            const reviewForm = document.getElementById('reviewForm');
-            const reviewsList = document.getElementById('reviewsList');
-            const mediaInput = document.getElementById('reviewMedia');
-            const mediaPreview = document.getElementById('mediaPreview');
-            
-            // Submit form via AJAX
-            if (reviewForm) {
-                reviewForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const formData = new FormData(this);
-                    fetch('{% url "submit_review" product.uid %}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message === 'Review submitted successfully') {
-                            alert('Your review has been posted successfully!');
-                            loadReviews(); // Load reviews after submission
-                            reviewForm.reset(); // Reset form after submission
-                            mediaPreview.innerHTML = ''; // Clear media preview
-                        } else {
-                            alert('Error submitting review. Please try again.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                    });
-                });
-            }
+        return "";
+    }
+    
+    async function loadCartFromBackend() {
+        try {
+            const response = await fetch('/load-cart-on-login/');
+            const data = await response.json();
+            cart = data.cart || [];
+        } catch (error) {
+            console.error("Error loading cart:", error);
+        }
+    }
+    
+    function updateCartCount() {
+        const countElement = document.getElementById("cart-count");
+        if (countElement) {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            countElement.textContent = totalItems;
+        }
+    }
+    
+
         
-            // Real-time media preview (to see the images before submitting)
-            if (mediaInput) {
-                mediaInput.addEventListener('change', function(e) {
-                    mediaPreview.innerHTML = ''; // Clear previous preview
-                    for (let i = 0; i < this.files.length; i++) {
-                        const file = this.files[i];
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const mediaElement = file.type.startsWith('image/')
-                                ? `<img src="${e.target.result}" alt="Preview" style="max-width: 100px; max-height: 100px;">`
-                                : `<video src="${e.target.result}" controls style="max-width: 100px; max-height: 100px;"></video>`;
-                            mediaPreview.innerHTML += mediaElement; // Append new media to preview
-                        }
-                        reader.readAsDataURL(file);
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const reviewForm = document.getElementById("reviewForm");
+        const reviewsList = document.getElementById("reviewsList");
+        const mediaPreview = document.getElementById("mediaPreview");
+    
+        // Function to fetch and display reviews after submission
+        function fetchReviews(productUid) {
+            fetch(`/get-reviews/${productUid}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                });
-            }
-        
-            // Load reviews and display them
-            function loadReviews() {
-                fetch('{% url "get_reviews" product.uid %}')
-                .then(response => response.json())
+                    return response.json();
+                })
                 .then(data => {
-                    reviewsList.innerHTML = ''; // Clear existing reviews
+                    reviewsList.innerHTML = ""; // Clear old reviews
+    
+                    if (!data.reviews || data.reviews.length === 0) {
+                        reviewsList.innerHTML = "<p>No reviews yet.</p>";
+                        return;
+                    }
+    
                     data.reviews.forEach(review => {
-                        const reviewElement = document.createElement('div');
-                        reviewElement.className = 'review-item';
-        
-                        // Fix: Check if review.media is an array or a string
-                        let mediaContent = '';
-                        if (Array.isArray(review.media)) {
-                            // Handle array of media
-                            mediaContent = review.media.map(mediaUrl => 
-                                mediaUrl.endsWith('.mp4') 
-                                ? `<video src="${mediaUrl}" controls style="max-width: 200px; max-height: 200px;"></video>` 
-                                : `<img src="${mediaUrl}" alt="Review media" style="max-width: 200px; max-height: 200px;">`
-                            ).join('');
-                        } else if (review.media) {
-                            // Handle single media (string)
-                            mediaContent = review.media.endsWith('.mp4') 
-                                ? `<video src="${review.media}" controls style="max-width: 200px; max-height: 200px;"></video>` 
-                                : `<img src="${review.media}" alt="Review media" style="max-width: 200px; max-height: 200px;">`;
-                        }
-        
-                        reviewElement.innerHTML = `
+                        const reviewItem = document.createElement("div");
+                        reviewItem.classList.add("review-item");
+    
+                        reviewItem.innerHTML = `
                             <div class="review-header">
-                                <span class="review-author">${review.user}</span>
+                                <strong>${review.user}</strong>
                                 <span class="review-date">${new Date(review.created_at).toLocaleDateString()}</span>
                             </div>
-                            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
-                            <div class="review-content">${review.text}</div>
-                            <div class="review-media">${mediaContent}</div>
-                            ${review.can_delete ? `<button class="delete-review" data-review-id="${review.id}">Delete</button>` : ''}
+                            <div class="review-rating">${"⭐".repeat(review.rating)}</div>
+                            <p class="review-text">${review.text}</p>
+                            ${review.media ? `<img src="${review.media}" alt="Review Image" class="review-media">` : ""}
+                            ${review.can_delete ? `<button class="delete-review" data-id="${review.id}">🗑 Delete</button>` : ""}
                         `;
-                        reviewsList.appendChild(reviewElement);
+    
+                        reviewsList.appendChild(reviewItem);
                     });
-                    addDeleteListeners(); // Re-add delete button listeners
-                })
-                .catch(error => console.error('Error:', error));
-            }
-            
-            // Handle review deletion
-            function addDeleteListeners() {
-                const deleteButtons = document.querySelectorAll('.delete-review');
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const reviewId = this.dataset.reviewId;
-                        if (confirm('Are you sure you want to delete this review?')) {
-                            deleteReview(reviewId);
-                        }
+    
+                    // Attach event listeners for delete buttons
+                    document.querySelectorAll(".delete-review").forEach(button => {
+                        button.addEventListener("click", function () {
+                            deleteReview(this.dataset.id);
+                        });
                     });
-                });
-            }
-        
-            // Delete review via AJAX
-            function deleteReview(reviewId) {
-                fetch(`{% url "delete_review" 0 %}`.replace('0', reviewId), {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message === 'Review deleted successfully') {
-                        loadReviews(); // Reload reviews after deletion
-                    } else {
-                        alert('Error deleting review. Please try again.');
-                    }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
+                    console.error("Error fetching reviews:", error);
+                    alert("An error occurred while fetching reviews.");
                 });
-            }
-        
-            // Initial load of reviews
-            loadReviews();
+        }
+    
+        // Submit review
+        reviewForm?.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const formData = new FormData(reviewForm);
+            const productUid = formData.get("product_id");
+    
+            fetch(reviewForm.action, {
+                method: "POST",
+                body: formData,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Review submitted successfully") {
+                    alert("Review posted successfully!");
+                    reviewForm.reset();
+                    mediaPreview.innerHTML = ""; // Clear media preview
+                    setTimeout(() => fetchReviews(productUid), 500); // Delay fetching to ensure DB update
+                } else {
+                    alert("Failed to submit review. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error submitting review:", error);
+                alert("An error occurred while submitting your review.");
+            });
         });
-        
+    
+        // Fetch reviews when the page loads
+        const productUid = document.querySelector("[name='product_id']").value;
+        fetchReviews(productUid);
+    
+        // Media preview handler
+        document.getElementById("reviewMedia")?.addEventListener("change", function (event) {
+            mediaPreview.innerHTML = ""; // Clear previous previews
+            Array.from(event.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.classList.add("media-preview-item");
+                    img.style.maxWidth = "150px"; // Ensure images don't overflow
+                    img.style.maxHeight = "150px"; 
+                    img.style.height = "auto";
+                    img.style.objectFit = "contain"; // Maintain aspect ratio
+                    mediaPreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    
+        // Delete review
+        function deleteReview(reviewId) {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Get CSRF token from the page
+    
+            fetch(`/delete-review/${reviewId}/`, {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": csrftoken, // Include CSRF token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Review deleted successfully") {
+                    alert("Review deleted.");
+                    fetchReviews(document.querySelector("[name='product_id']").value);
+                } else {
+                    alert("Failed to delete review.");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting review:", error);
+                alert("An error occurred while deleting the review.");
+            });
+        }
+    });
+    
+
+
+    document.getElementById('cart-btn').addEventListener('click', () => {
+        window.location.href = "/cart/";
+    });
+    
+
     </script>
+    
+    
+
+
+        
+
+
+
+
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-

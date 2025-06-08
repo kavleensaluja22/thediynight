@@ -26,12 +26,14 @@ SECRET_KEY = 'django-insecure-8(m0c7l$arcolnk_@g_!!snqs44zy*kw$z94t#g9(36^9jamwo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.124', 'localhost', '0.0.0.0','127.0.0.1']
+ALLOWED_HOSTS = ['192.168.1.124', 'localhost', '0.0.0.0','127.0.0.1','http://192.168.1.111:8000','192.168.1.111', '192.168.1.37',
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+ 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,12 +49,14 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google', 
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.apple',
-    'django.contrib.sites',  # Required by Django Allauth
+    'django.contrib.sites',
+      # Required by Django Allauth
   
   
 ]
 
 AUTHENTICATION_BACKENDS =[
+    'accounts.backends.EmailBackend',
     'allauth.account.auth_backends.AuthenticationBackend',  # Correct spelling here # google
     'django.contrib.auth.backends.ModelBackend',  # For Django's default authentication
     
@@ -67,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middleware.CartMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'appname.middleware.SaveCartOnLogoutMiddleware',
 ]
 
 
@@ -83,6 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'appname.context_processors.cart_count_processor',
             ],
         },
     },
@@ -184,12 +190,50 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "kavleensaluja22@gmail.com"
 EMAIL_HOST_PASSWORD = "njth yuiq zmjo rrqb"
-EMAIL_USE_TLS = True
+
 EMAIL_USE_SSL = False
 
-SOCIALACCOUNT_LOGIN_ON_GET = True
-LOGIN_REDIRECT_URL = 'success'
+# SITE_ID = 1
 
+ACCOUNT_EMAIL_REQUIRED = True  
+ACCOUNT_AUTHENTICATION_METHOD = "email"  
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Ensure verification is required
+SOCIALACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Enforce email verification for social logins
+SOCIALACCOUNT_AUTO_SIGNUP = False  # Prevent automatic signup before email verification
 
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_SECONDS = 600  # Token expires in 10 minutes
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True 
+# SOCIALACCOUNT_ADAPTER = "appname.adapters.MySocialAccountAdapter"
+
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # or "optional"
+# ACCOUNT_AUTHENTICATION_METHOD = "email"
+
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+SOCIALACCOUNT_AUTO_SIGNUP = False  # Prevent auto-signup without email confirmation
+
+EMAIL_USE_HTML = True
 
 SITE_ID = 2
+
+# settings.py
+LOGIN_URL = '/user_login'  # Redirect to this URL if the user is not logged in
+
+RAZORPAY_KEY_ID = "rzp_test_4t8nCdN7uI0xEP"
+RAZORPAY_KEY_SECRET = "6PWff6o8IE8dtouN2DMfBquc"
+
+ACCOUNT_SIGNUP_REDIRECT_URL = '/'  # Redirect home after email confirmation
+ACCOUNT_LOGIN_REDIRECT_URL = '/'  # Ensure login also redirects home
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/'  # Redirect for logged-out users
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
+
+ACCOUNT_ADAPTER = "accounts.adapters.MyAccountAdapter"
+
+DEFAULT_FROM_EMAIL = 'kavleensaluja22@gmail.com'  # or your verified domain email
+
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+
+SHIPROCKET_EMAIL="work.kavleen@gmail.com"
+SHIPROCKET_PASSWORD="x@9yRW1Qw4TF#p$P"
