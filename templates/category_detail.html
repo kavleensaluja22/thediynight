@@ -1090,17 +1090,17 @@
             <a href="/" class="logo">@thediynight</a>
             <nav class="nav">
                 <a href="/" class="nav-item">Shop</a>
-                {% comment %} <a href="/track" class="nav-item">Track</a> {% endcomment %}
+                <a href="/track/" class="nav-item">Track</a>
                 <a href="/user/" class="nav-item">
                     {% if request.user.is_authenticated %}
-                        {{ request.user.username }}
+                        {{ request.user.profile.name|default:request.user.username }}
                     {% else %}
                         User
                     {% endif %}
                 </a>
                 <div class="cart-icon">
                     <button class="nav-item" id="cart-btn">Cart</button>
-                    <span class="cart-count" id="cart-count">0</span>
+                    <span class="cart-count" id="cart-count">{{ cart_count }}</span>
                 </div>
             </nav>
         </header>

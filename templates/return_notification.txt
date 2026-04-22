@@ -1,0 +1,15 @@
+Hello {{ seller_name }},
+
+A return has been requested for Order #{{ order_id }} (SubOrder ID: {{ suborder_id }}).
+
+Customer: {{ customer_name }} ({{ customer_email }})
+
+Products:
+{% for item in product_list %}
+- {{ item.quantity }} x {{ item.product.product_name }}
+{% endfor %}
+
+Please check your seller dashboard to approve and process the return.
+
+Regards,  
+@thediynight Team

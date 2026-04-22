@@ -712,66 +712,6 @@ body {
 }
 
 
-
-
-{% comment %} 
-.product-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.product-card {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-}
-
-.product-image img {
-  width: 100%;
-  height: auto;
-}
-
-.actions {
-  margin-top: 10px;
-}
-
-.btn-remove {
-  color: red;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-
-
-
-.product-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.product-card {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-}
-
-.product-image img {
-  width: 100%;
-  height: auto;
-}
-
-.actions {
-  margin-top: 10px;
-}
-
-.btn-remove {
-  color: red;
-  text-decoration: none;
-  font-weight: bold;
-} {% endcomment %}
-
 body {
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
@@ -948,19 +888,50 @@ body {
 .product-card:hover {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
-
-
+@media (min-width: 768px) {
+  .logo {
+    text-align: left;
+  }
+}
+@media (max-width: 640px) {
+    .logo {
+      text-align: left !important;
+      margin-left: 0.7rem;
+    }
+  }
+  .logo {
+    display: block;
+    font-weight: bold;
+    font-size: 1.40rem;
+    color: #6daabd;
+    text-decoration: none;
+    text-align: left; /* Default for large screens */
+    margin-left: 0;   /* No left margin */
+  }
+  
+  /* On small screens - center the logo */
+  @media (max-width: 640px) {
+    .logo {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  
 
     </style>
   </head>
   <body>
     <div class="container">
         <header class="header">
-            <a href="/" class="logo">@thediynight</a>
+          <a href="/" class="logo">
+            @thediynight
+          </a>
+          
             <nav class="nav">
-                <a href="/" class="nav-item">Shop</a>
-                {% comment %} <a href="/track" class="nav-item">Track</a> {% endcomment %}
-                <a href="/user/" class="nav-item">
+              <a href="/" class="nav-item">Shop</a>
+              <a href="/track/" class="nav-item">Track</a>
+              <a href="/user/" class="nav-item">
                   {% if request.user.is_authenticated %}
                       {{ request.user.profile.name|default:request.user.username }}
                   {% else %}
@@ -968,11 +939,11 @@ body {
                   {% endif %}
               </a>
               <div class="cart-icon">
-                <button class="nav-item" id="cart-btn">Cart</button>           
+                <a href="/cart/" class="nav-item" id="cart-btn">Cart</a>
                 <span class="cart-count" id="cart-count">{{ cart_count }}</span>
-
-            </div>
-            </nav>
+              </div>
+              
+          </nav>
         </header>
 
     
@@ -982,56 +953,85 @@ body {
     <main class="dashboard">
       <div class="dashboard-container">
         <section class="info-cards">
-          <article class="profile-card">
-            <div class="profile-details">
+          <form method="POST" enctype="multipart/form-data" id="profile-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+        
+            <article class="profile-card">
+              <div class="profile-details">
+                <h2 class="card-title">Profile Information</h2>
+        
+                <!-- First Name -->
+                <p class="field-label">First Name</p>
+                <p class="field-value name-value">{{ request.user.profile.name|default:"Not Provided" }}</p>
+                <input type="text" class="edit-input name-input hidden" value="{{ request.user.profile.name|default:'' }}">
+                <button type="button" class="edit-button" data-field="name">Edit</button>
+        
+                <!-- Last Name -->
+                <p class="field-label">Last Name</p>
+                <p class="field-value last_name-value">{{ request.user.profile.last_name|default:"Not Provided" }}</p>
+                <input type="text" class="edit-input last_name-input hidden" value="{{ request.user.profile.last_name|default:'' }}">
+                <button type="button" class="edit-button" data-field="last_name">Edit</button>
+        
+                <!-- Email Address -->
+                <p class="field-label">Email Address</p>
+                <p class="field-value email-value">{{ request.user.profile.email|default:"Not Provided" }}</p>
+        
+                <!-- Phone -->
+                <p class="field-label">Phone</p>
+                <p class="field-value phone-value">{{ request.user.profile.phone|default:"Not Provided" }}</p>
+                <input type="text" class="edit-input phone-input hidden" value="{{ request.user.profile.phone|default:'' }}">
+                <button type="button" class="edit-button" data-field="phone">Edit</button>
+        
+<!-- House / Flat Number -->
+<p class="field-label">Flat / House No.</p>
+<p class="field-value house_number-value">{{ request.user.profile.house_number|default:"Not Provided" }}</p>
+<input type="text" class="edit-input house_number-input hidden" value="{{ request.user.profile.house_number|default:'' }}">
+<button type="button" class="edit-button" data-field="house_number">Edit</button>
 
-                <section class="info-cards">
-                  <form method="POST" enctype="multipart/form-data" id="profile-form">
-                      
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <article class="profile-card">
-                            <div class="profile-details">
-                                <h2 class="card-title">Profile Information</h2>
-                    
-                                <p class="field-label">First Name</p>
-                                <p class="field-value name-value">{{ request.user.profile.name|default:"Not Provided" }}</p>
-                                <input type="text" class="edit-input name-input hidden" value="{{ request.user.profile.name|default:'' }}">
-                                <button type="button" class="edit-button" data-field="name">Edit</button>
 
-                             
+<!-- Street / Road -->
+<p class="field-label">Street / Road</p>
+<p class="field-value street-value">{{ request.user.profile.street|default:"Not Provided" }}</p>
+<input type="text" class="edit-input street-input hidden" value="{{ request.user.profile.street|default:'' }}">
+<button type="button" class="edit-button" data-field="street">Edit</button>
 
-                                <p class="field-label">Email Address</p>
-                                <p class="field-value email-value">{{ request.user.profile.email |default:"Not Provided" }}</p>
-                                
-                   
-                                <p class="field-label">Phone</p>
-            <p class="field-value phone-value">{{ request.user.profile.phone|default:"Not Provided" }}</p>
-            <input type="text" class="edit-input phone-input hidden" value="{{ request.user.profile.phone|default:'' }}">
-            <button type="button" class="edit-button" data-field="phone">Edit</button>
+<!-- Area / Locality -->
+<p class="field-label">Area / Locality</p>
+<p class="field-value locality-value">{{ request.user.profile.locality|default:"Not Provided" }}</p>
+<input type="text" class="edit-input locality-input hidden" value="{{ request.user.profile.locality|default:'' }}">
+<button type="button" class="edit-button" data-field="locality">Edit</button>
 
-            <!-- Address Field -->
-                    
-            <p class="field-label">Address</p>
-             <p class="field-value address-value">{{ request.user.profile.address|default:"Not Provided" }}</p>
-            <textarea class="edit-input address-input hidden" rows="4" cols="50">{{ request.user.profile.address|default:'' }}</textarea>
-            <button type="button" class="edit-button" data-field="address">Edit</button>
-
-            <p class="field-label">Pincode</p>
-            <p class="field-value coustmer_pincode-value">{{ request.user.profile.coustmer_pincode|default:"Not Provided" }}</p>
-            <input type="number" class="edit-input coustmer_pincode-input hidden" value="{{ request.user.profile.coustmer_pincode|default:'' }}">
-
-           <button type="button" class="edit-button" data-field="coustmer_pincode">Edit</button>
-                    
-            <button type="button" class="save-button hidden">Save Changes</button>
-                            </div>
-                        </article>
-                    </form>
+        
+                <!-- City -->
+                <p class="field-label">City</p>
+                <p class="field-value city-value">{{ request.user.profile.city|default:"Not Provided" }}</p>
+                <input type="text" class="edit-input city-input hidden" value="{{ request.user.profile.city|default:'' }}">
+                <button type="button" class="edit-button" data-field="city">Edit</button>
+        
+                <!-- State -->
+                <p class="field-label">State</p>
+                <p class="field-value state-value">{{ request.user.profile.state|default:"Not Provided" }}</p>
+                <input type="text" class="edit-input state-input hidden" value="{{ request.user.profile.state|default:'' }}">
+                <button type="button" class="edit-button" data-field="state">Edit</button>
+        
+                <!-- Pincode -->
+                <p class="field-label">Pincode</p>
+                <p class="field-value coustmer_pincode-value">{{ request.user.profile.coustmer_pincode|default:"Not Provided" }}</p>
+                <input type="number" class="edit-input coustmer_pincode-input hidden" value="{{ request.user.profile.coustmer_pincode|default:'' }}">
+                <button type="button" class="edit-button" data-field="coustmer_pincode">Edit</button>
+        
+                <!-- Save Button -->
+                <button type="submit" class="save-button hidden">Save Changes</button>
+              </form>
+              </div>
+         
+            </article>
+         
+        
                     
           
-                </section>
-            </div>
-        </article>
+
 
  
       
@@ -1076,6 +1076,17 @@ body {
         </section>
         {% endblock %}
         
+        {% for suborder in order.suborders.all %}
+  {% if suborder.status == "Delivered" and not suborder.return_requested_at %}
+    <form action="{% url 'request_return' suborder.id %}" method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger">Request Return</button>
+    </form>
+  {% elif suborder.is_return_requested %}
+    <span class="badge bg-warning">Return Requested</span>
+  {% endif %}
+{% endfor %}
+
 
         <section class="security-section">
           <h2 class="section-title">Account Security</h2>
@@ -1103,123 +1114,32 @@ body {
 
       </div>
 
-      <div style="display: flex; justify-content: center; margin: 2rem 0;">
-        <a href="{% url 'user_main' %}" style="width: 100%; max-width: 64rem;">
-            <button
-                type="button"
-                style="
-                    width: 100%;
-                    background-color: #6daabd;
-                    color: white;
-                    font-size: 1.25rem;
-                    font-weight: 500;
-                    padding: 1.25rem 0;
-                    border: none;
-                    border-radius: 1rem;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                    transition: background-color 0.3s ease-in-out;
-                    cursor: pointer;
-                "
-                onmouseover="this.style.backgroundColor='#5b98a3'"
-                onmouseout="this.style.backgroundColor='#6daabd'"
-            >
-                Want to add your product? Check Me
-            </button>
-        </a>
-    </div>
-    <h1>Your Product</h1>
-    {% if products %}
-    <div class="product-list" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start;">
-        {% for product in products %}
-        <div class="product-card" style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; width: 250px; text-align: center;" data-uid="{{ product.uid }}">
-          <!-- Link to Product Detail Page -->
-          <a href="{% url 'prodd' product_slug=product.slug %}" style="text-decoration: none; color: inherit;">
-              <div class="product-image" style="height: 200px; width: 100%; overflow: hidden; margin-bottom: 12px; border-radius: 8px;">
-                  <img src="{{ product.main_image_url }}" 
-                       class="main-product-image" 
-                       alt="{{ product.product_name }}" 
-                       style="width: 100%; height: 100%; object-fit: cover;">
-              </div>
-                <h3 class="product-name">{{ product.product_name }}</h3>
-                <p class="product-description">{{ product.product_description }}</p>
-                <span class="price">Rs. <span class="product-price">{{ product.price }}</span></span>
-            </a>
-            
-            <!-- Actions Section: Edit and Remove -->
-            <div class="actions" style="margin-top: 10px;">
-                <button class="edit-btn" style="margin-right: 10px; padding: 6px 12px; background-color: #6daabd; color: white; border-radius: 4px;">Edit</button>
-                <a href="{% url 'remove_product' product_id=product.uid %}" style="padding: 6px 12px; background-color: #e74c3c; color: white; border-radius: 4px; text-decoration: none;">Remove</a>
-            </div>
-            
-            <!-- Hidden Edit Form -->
-            <form id="edit-product-form-{{ product.uid }}" data-product-id="{{ product.uid }}" method="POST" enctype="multipart/form-data" style="display: none; width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-family: Arial, sans-serif;">
-              {% csrf_token %}
-              
-              <input type="text" name="product_name" value="{{ product.product_name }}" placeholder="Product Name" 
-                     style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"><br>
-              
-              <input type="number" name="price" value="{{ product.price }}" placeholder="Price" step="0.01" 
-                     style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"><br>
-              
-              <textarea name="product_description" placeholder="Product Description" 
-                        style="width: 100%; height: 120px; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">{{ product.product_description }}</textarea><br>
-              
-              <select name="category" style="width: 100%; padding: 8px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                  {% for category in categories %}
-                      <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
-                          {{ category.category_name }}
-                      </option>
-                  {% endfor %}
-              </select><br>
-          
-              <h4 style="margin-bottom: 8px;">Sizes:</h4>
-              <div id="size-container">
-                  <div class="size-row" style="margin-bottom: 10px;">
-                      <input type="text" name="size_name[]" placeholder="Size name" 
-                             style="width: 48%; padding: 8px; margin-right: 4%; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                      <input type="number" name="size_price[]" placeholder="Extra Price" 
-                             style="width: 48%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                  </div>
-              </div>
-              <button type="button" onclick="addSizeRow()" 
-                      style="padding: 8px 12px; background-color: #6daabd; color: white; border: none; border-radius: 4px; font-size: 14px; margin-bottom: 15px;">+ Add Size</button>
-          
-              <h4 style="margin-bottom: 8px;">Colors:</h4>
-              <div id="color-container">
-                  <div class="color-row" style="margin-bottom: 10px;">
-                      <input type="text" name="color_name[]" placeholder="Color name" 
-                             style="width: 48%; padding: 8px; margin-right: 4%; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                      <input type="number" step="0.01" name="color_price[]" placeholder="Extra Price" 
-                             style="width: 48%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                  </div>
-              </div>
-              <button type="button" onclick="addColorRow()" 
-                      style="padding: 8px 12px; background-color: #6daabd; color: white; border: none; border-radius: 4px; font-size: 14px; margin-bottom: 15px;">+ Add Color</button>
-          
-              <label style="font-weight: bold; display: block; margin-bottom: 5px;">Change Main Image:</label>
-              <input type="file" name="main_image" class="mainImageInput" accept="image/*" 
-                     style="margin-bottom: 15px;"><br>
-              <div class="mainImagePreview" style="margin-bottom: 15px; padding: 5px; background-color: #FFFFFF; border: 1px solid #ddd; border-radius: 4px;"></div>
-          
-              <label style="font-weight: bold; display: block; margin-bottom: 5px;">Replace Other Images (Max 3):</label>
-              <input type="file" class="imageInput" name="additional_images" multiple accept="image/*" 
-                     style="margin-bottom: 15px;"><br>
-              <div class="imagePreview" id="imagePreview" style="margin-bottom: 15px; padding: 5px; background-color: #FFFFFF; border: 1px solid #ddd; border-radius: 4px;"></div>
-          
-              <button type="submit" 
-                      style="padding: 10px 20px; background-color: #6daabd; color: white; border: none; border-radius: 4px; font-size: 14px; margin-right: 10px;">Save</button>
-              
-              <button type="button" class="cancel-btn" 
-                      style="padding: 10px 20px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; font-size: 14px;">Cancel</button>
-          </form>
-          
-    
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-        <p>You haven't added any products yet.</p>
-    {% endif %}
+      
+    <div style="display: flex; justify-content: center; margin: 2rem 0;">
+      <a href="{% url 'sellerdashboard' %}" style="width: 100%; max-width: 64rem;">
+          <button
+              type="button"
+              style="
+                  width: 100%;
+                  background-color: #6daabd;
+                  color: white;
+                  font-size: 1.25rem;
+                  font-weight: 500;
+                  padding: 1.25rem 0;
+                  border: none;
+                  border-radius: 1rem;
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                  transition: background-color 0.3s ease-in-out;
+                  cursor: pointer;
+              "
+              onmouseover="this.style.backgroundColor='#5b98a3'"
+              onmouseout="this.style.backgroundColor='#6daabd'"
+          >
+              Seller Account
+          </button>
+      </a>
+  </div>
+   
   </main>    
  
   
@@ -1227,60 +1147,76 @@ body {
 
 
       <script>
-      document.addEventListener("DOMContentLoaded", function () {
-    const editButtons = document.querySelectorAll(".edit-button");
-    const saveButton = document.querySelector(".save-button");
+        document.addEventListener("DOMContentLoaded", function () {
+          const editButtons = document.querySelectorAll(".edit-button");
+          const saveButton = document.querySelector(".save-button");
+      
+          let editedFields = {}; // Store edited values
+      
+          editButtons.forEach((button) => {
+              button.addEventListener("click", function () {
+                let fieldType = this.getAttribute("data-field"); 
+                  let textElement = document.querySelector(`.${fieldType}-value`);
+                  let inputElement = document.querySelector(`.${fieldType}-input`);
+      
+                  // Toggle visibility
+                  textElement.classList.toggle("hidden");
+                  inputElement.classList.toggle("hidden");
+      
+                  if (!inputElement.classList.contains("hidden")) {
+                      inputElement.focus();
+                      this.innerText = "Cancel";
+                  } else {
+                      this.innerText = "Edit";
+                  }
+      
+                  saveButton.classList.remove("hidden"); // Show save button
+              });
+          });
+      
+          saveButton.addEventListener("click", function () {
+              let name = document.querySelector(".name-input")?.value.trim() || "";
+              let last_name = document.querySelector(".last_name-input")?.value.trim() || "";
+              let phone = document.querySelector(".phone-input")?.value.trim() || "";
+              let house_number = document.querySelector(".house_number-input")?.value.trim() || "";
+              let street = document.querySelector(".street-input")?.value.trim() || "";
+              let locality = document.querySelector(".locality-input")?.value.trim() || "";
+              let coustmer_pincode = document.querySelector(".coustmer_pincode-input")?.value.trim() || "";
+              let city = document.querySelector(".city-input")?.value.trim() || "";
+              let state = document.querySelector(".state-input")?.value.trim() || "";
+      
+              fetch("/dashboard_view/", {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                  },
+                  body: JSON.stringify({
+                      name,
+                      last_name,
+                      phone,
+                      house_number,
+                      street,
+                      locality,
+                      coustmer_pincode,
+                      city,
+                      state
+                  }),
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      alert("✅ Profile updated successfully!");
+                      location.reload();
+                  } else {
+                      alert("❌ Failed to update profile.");
+                  }
+              })
+              .catch(error => console.error("Error:", error));
+          });
+      });
 
-    let editedFields = {}; // Store edited values
-
-    editButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-            let fieldType = this.getAttribute("data-field");
-            let textElement = document.querySelector(`.${fieldType}-value`);
-            let inputElement = document.querySelector(`.${fieldType}-input`);
-
-            // Toggle visibility
-            textElement.classList.toggle("hidden");
-            inputElement.classList.toggle("hidden");
-
-            if (!inputElement.classList.contains("hidden")) {
-                inputElement.focus();
-                this.innerText = "Cancel";
-            } else {
-                this.innerText = "Edit";
-            }
-
-            saveButton.classList.remove("hidden"); // Show save button when any field is edited
-        });
-    });
-
-    saveButton.addEventListener("click", function () {
-        let name = document.querySelector(".name-input").value.trim();
-        let phone = document.querySelector(".phone-input").value.trim();
-        let address = document.querySelector(".address-input").value.trim();
-        let coustmer_pincode = document.querySelector(".coustmer_pincode-input").value.trim();
-
-
-        fetch("/dashboard_view/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
-            },
-            body: JSON.stringify({ name, phone, address, coustmer_pincode }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("✅ Profile updated successfully!");
-                location.reload();
-            } else {
-                alert("❌ Failed to update profile.");
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
-});
+      
 document.querySelector(".address-input").addEventListener("input", function () {
   this.style.height = "auto";
   this.style.height = this.scrollHeight + "px";
@@ -1291,9 +1227,6 @@ document.querySelector(".address-input").addEventListener("input", function () {
 
 
 
-document.getElementById('cart-btn').addEventListener('click', () => {
-  window.location.href = "/cart/";
-});
 
   
 
@@ -1481,6 +1414,11 @@ fetch(`/remove_product/${productId}/`, {
       // Optionally remove the product card from the DOM
       document.querySelector(`#product-${productId}`).remove();
   }
+});
+
+
+document.getElementById('cart-btn').addEventListener('click', () => {
+  window.location.href = "/cart/";
 });
 
 

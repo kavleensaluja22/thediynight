@@ -3,10 +3,10 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import ProductImage, Product, SizeVariant, ColorVariant, Category
 from .models import PromoCode
-from .models import SellerProfile
+# from .models import SellerProfile
 from .models import ProductView
 
-
+from .models import SubOrder
 # admin.py
 
 from django.contrib import admin
@@ -27,15 +27,24 @@ class SizeVariantInline(admin.TabularInline):
     extra = 1
 
 @admin.register(Product)
-
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [
-        ProductImageInline,
-        ColorVariantInline,
-        SizeVariantInline,
-    ]
-    list_display = ('product_name', 'uid', 'category', 'price', 'seller_name')  # added uid and seller_name
-    prepopulated_fields = {'slug': ('product_name',)}
+    list_display = ('product_name', 'price', 'pincode', 'created_at', 'get_seller_name')
+    inlines = [ProductImageInline, ColorVariantInline, SizeVariantInline]
+
+    # Show fields in admin form
+    fields = (
+    'user', 'category', 'product_name', 'slug', 'product_description',
+    'weight', 'length', 'breadth', 'height', 'price', 'pincode',
+    'color_variants', 'size_variants',
+)
+
+    filter_horizontal = ( 'color_variants', 'size_variants')
+
+    def get_seller_name(self, obj):
+        return obj.user.profile.name or "N/A"
+    get_seller_name.short_description = 'Seller Name'
+
+
 
 # Category Admin
 @admin.register(Category)
@@ -101,4 +110,6 @@ admin.site.register (PromoCode)
 
 admin.site.register (ProductView)
 
-admin.site.register (SellerProfile)
+# admin.site.register (SellerProfile)
+
+admin.site.register (SubOrder)

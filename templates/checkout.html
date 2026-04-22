@@ -588,6 +588,7 @@
           <a href="/" class="logo">@thediynight</a>
           <nav class="nav">
             <a href="/" class="nav-item">Shop</a>
+            <a href="/track/" class="nav-item">Track</a>
             <a href="/user/" class="nav-item">
                 {% if request.user.is_authenticated and request.user.first_name %}
                 {{ request.user.first_name }}
@@ -653,13 +654,18 @@
     <div class="saved-addresses" id="saved-addresses">
      
         <div class="address-card">
-          <p>{{ request.user.profile.address }}</p>
+          <p>{{ request.user.profile.house_number }}</p>
+          <p>{{ request.user.profile.street }}</p>
+          <p>{{ request.user.profile.city }}</p>
+          <p>{{ request.user.profile.state }}</p>
+          <p>{{ request.user.profile.coustmer_pincode }}</p>
+  
         </div>
    
     </div>
 
     <button type="button" class="add-address-button" id="open-address-form">
-      Add Address
+     Want To Add Another Address?
     </button>
 
  
@@ -787,7 +793,18 @@
                     <h3>Shipping Address</h3>
                     <div class="review-content" id="review-shipping-address">
                       <!-- Will be populated by JavaScript -->
-                      <p class="loading-message">{{ request.user.profile.address|default:"Not Provided" }}</p>
+                      <div class="saved-addresses" id="saved-addresses">
+     
+                        <div class="address-card">
+                          <p>{{ request.user.profile.house_number }}</p>
+                          <p>{{ request.user.profile.street }}</p>
+                          <p>{{ request.user.profile.city }}</p>
+                          <p>{{ request.user.profile.state }}</p>
+                          <p>{{ request.user.profile.coustmer_pincode }}</p>
+                  
+                        </div>
+                   
+                    </div>
                     </div>
                    
                   </div>
@@ -850,7 +867,7 @@
                       <p>Color: {{ item.color_variant.color_name }}</p>
                     {% endif %}
             
-                    <p>Price: Rs. {{ item.get_price }}</p>
+                    <p>Price: Rs. {{ item.get_total_price|floatformat:2 }} </p>
                   </div>
                 {% endfor %}
               {% else %}
@@ -865,30 +882,35 @@
             
               <div class="summary-subtotal">
                 <span>Subtotal</span>
-                <span id="subtotal-amount">Rs. {{ subtotal }}</span>
+                <span id="subtotal-amount">Rs. {{ subtotal|floatformat:2 }}</span>
               </div>
               <div class="summary-subtotal">
                 <span>Pincode</span>
                 <span id="subtotal-amount">Rs. {{request.user.profile.coustmer_pincode  }}</span>
               </div>
-            
-              {% comment %} <div class="summary-shipping">
+              <li>
+                <span>Platform Fee ({{ platform_fee|floatformat:2 }}):</span>
+                <span>₹{{ platform_fee }}</span>
+              </li>
+          
+              <div class="summary-shipping">
                 <span>Shipping</span>
-                <span id="shipping-amount">Rs. {{ shipping }}</span>
+                <span id="shipping-amount">Rs. {{ shipping|floatformat:2 }}</span>  <!-- ✅ now correct -->
               </div>
-              <table>
-                <tr>
-                  <th>Product</th>
-                  <th>Shipping Provider</th>
-                  <th>Shipping Cost</th>
-                  <th>Delivery (Days)</th>
+              
+              <table style="width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 0.95rem; color: #333;">
+                <tr style="background-color: #6daabd; color: white;">
+                  <th style="text-align: left; padding: 12px; border: 1px solid #ccc;">Product</th>
+                  <th style="text-align: left; padding: 12px; border: 1px solid #ccc;">Shipping Provider</th>
+                  <th style="text-align: left; padding: 12px; border: 1px solid #ccc;">Shipping Cost</th>
+                  <th style="text-align: left; padding: 12px; border: 1px solid #ccc;">Delivery (Days)</th>
                 </tr>
                 {% for item in shipping_breakdown %}
-                <tr>
-                  <td>{{ item.product }}</td>
-                  <td>{{ item.provider }}</td>
-                  <td>₹{{ item.cost }}</td>
-                  <td>
+                <tr style="background-color: #f9fafb;">
+                  <td style="padding: 12px; border: 1px solid #ccc;">{{ item.product }}</td>
+                  <td style="padding: 12px; border: 1px solid #ccc;">{{ item.provider }}</td>
+                  <td style="padding: 12px; border: 1px solid #ccc;">₹{{ item.cost|floatformat:2 }}</td>
+                  <td style="padding: 12px; border: 1px solid #ccc;">
                     {% if item.estimated_delivery_days %}
                       {{ item.estimated_delivery_days }} Days
                     {% else %}
@@ -899,62 +921,12 @@
                 {% endfor %}
               </table>
               
-              <div class="shipping-breakdown">
-                <h4>Shipping Breakdown:</h4>
-                <ul>
-                  {% for item in shipping_breakdown %}
-                    <li>{{ item.product }}: ₹{{ item.cost }} via {{ item.provider }}</li>
-                  {% endfor %}
-                </ul>
-              </div>
-              
-            
-              <div class="summary-total">
-                <span>Total</span>
-                <span id="total-amount">Rs. {{ total }}</span>
-              </div>
-            </div>
-            
-             {% endcomment %}<div class="summary-shipping">
-  <span>Shipping</span>
-  <span id="shipping-amount">Rs. {{ shipping }}</span>
-</div>
 
-<table>
-  <tr>
-    <th>Product</th>
-    <th>Shipping Provider</th>
-    <th>Shipping Cost</th>
-    <th>Delivery (Days)</th>
-  </tr>
-  {% for item in shipping_breakdown %}
-  <tr>
-    <td>{{ item.product }}</td>
-    <td>{{ item.provider }}</td>
-    <td>₹{{ item.cost }}</td>
-    <td>
-      {% if item.estimated_delivery_days %}
-        {{ item.estimated_delivery_days }} Days
-      {% else %}
-        Not available
-      {% endif %}
-    </td>
-  </tr>
-  {% endfor %}
-</table>
 
-<div class="shipping-breakdown">
-  <h4>Shipping Breakdown:</h4>
-  <ul>
-    {% for item in shipping_breakdown %}
-      <li>{{ item.product }}: ₹{{ item.cost }} via {{ item.provider }}</li>
-    {% endfor %}
-  </ul>
-</div>
 
 <div class="summary-total">
   <span>Total</span>
-  <span id="total-amount">Rs. {{ total }}</span>
+  <span id="total-amount">Rs. {{ total|floatformat:2 }}</span>
 </div>
 
             
@@ -1080,10 +1052,8 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('cart-btn').addEventListener('click', () => {
   window.location.href = "/cart/";
 });
-
 document.addEventListener("DOMContentLoaded", function () {
   const payButton = document.getElementById("rzp-cart-button");
-
   if (!payButton) return;
 
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -1098,71 +1068,76 @@ document.addEventListener("DOMContentLoaded", function () {
         "X-CSRFToken": csrfToken
       }
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-      if (data.order_id) {
-        const options = {
-          key: data.razorpay_key_id,
-          amount: data.amount,
-          currency: "INR",
-          name: "TheDIYNight",
-          description: `Cart Total: ₹${data.subtotal} + Shipping: ₹${data.shipping_cost}`,
-          order_id: data.order_id,
-          handler: function (response) {
-            fetch("/payment-callback/", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-              },
-              body: new URLSearchParams({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature
-              })
-            })
-            .then(res => res.json())
-            .then(data => {
-              if (data.status === "success") {
-                alert("Payment successful!");
-                window.location.href = "/";
-              } else {
-                alert("Payment failed. Please try again.");
-              }
-            });
-          },
-          prefill: {
-            name: data.user_name,
-            email: data.user_email,
-            contact: data.user_contact
-          },
-          theme: {
-            color: "#6daabd"
-          }
-        };
-
-        const rzp = new Razorpay(options);
-
-        // Add payment failed handler
-        rzp.on("payment.failed", function (response) {
-          alert("Payment failed. Reason: " + response.error.description);
-        });
-
-        rzp.open();
-      } else {
-        alert("Payment initialization failed. Please try again.");
+      if (!data.order_id || !data.amount) {
+        alert("Something went wrong while preparing payment.");
+        return;
       }
-    })
-    .catch(err => {
-      console.error("Payment error:", err);
-      alert("Something went wrong. Please try again.");
+
+      // Optional: show breakdown
+      const breakdownContainer = document.getElementById("price-breakdown");
+      if (breakdownContainer) {
+        breakdownContainer.innerHTML = `
+          <p><strong>Subtotal:</strong> ₹${data.subtotal.toFixed(2)}</p>
+          <p><strong>Discount:</strong> -₹${data.discount_amount.toFixed(2)}</p>
+          <p><strong>Shipping:</strong> ₹${data.shipping_cost.toFixed(2)}</p>
+          <p><strong>Total:</strong> ₹${data.total.toFixed(2)}</p>
+        `;
+      }
+
+      const shippingBreakdown = data.shipping_breakdown || [];
+
+      const options = {
+        key: data.razorpay_key_id,
+        amount: data.amount,
+        currency: "INR",
+        name: "TheDIYNight",
+        description: `Subtotal: ₹${data.subtotal.toFixed(2)}\nDiscount: -₹${data.discount_amount.toFixed(2)}\nShipping: ₹${data.shipping_cost.toFixed(2)}\nTotal: ₹${data.total.toFixed(2)}`,
+        order_id: data.order_id,
+        handler: function (response) {
+          const payload = new URLSearchParams();
+          payload.append("razorpay_order_id", response.razorpay_order_id);
+          payload.append("razorpay_payment_id", response.razorpay_payment_id);
+          payload.append("razorpay_signature", response.razorpay_signature);
+          payload.append("shipping_breakdown", JSON.stringify(shippingBreakdown)); // ✅ added
+
+          fetch("/payment-callback/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: payload
+          })
+          .then(res => res.json())
+          .then(callbackData => {
+            if (callbackData.status === "success") {
+              alert("🎉 Order placed successfully!");
+              window.location.href = "/";  // or order summary
+            } else {
+              alert("❌ Payment verified but order creation failed.");
+            }
+          })
+          .catch(error => {
+            console.error("Callback error:", error);
+            alert("⚠️ Something went wrong. Contact support.");
+          });
+        },
+        prefill: {
+          name: data.user_name,
+          email: data.user_email,
+          contact: data.user_contact
+        },
+        theme: {
+          color: "#6daabd"
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
     });
   });
 });
-
-
-
-
-
 
 
 document.addEventListener('DOMContentLoaded', function () {

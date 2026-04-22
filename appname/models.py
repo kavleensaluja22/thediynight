@@ -10,19 +10,35 @@ from accounts.models import Product
 from accounts.models import Product, ColorVariant, SizeVariant  # Import models from accounts
 
 class ProFile(models.Model):
-    id = models.BigAutoField(primary_key=True)  # Explicitly define a primary key
+    id = models.BigAutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    kyc_verified = models.BooleanField(default=False) 
-    coustmer_pincode = models.IntegerField()
+    
+    # Role flags
+    kyc_verified = models.BooleanField(default=False)
+    is_seller = models.BooleanField(default=False)  # NEW: becomes seller
+
+    # Common info (used by both buyer and seller)
     name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    coustmer_pincode = models.IntegerField(blank=True, null=True)
+    house_number = models.CharField(max_length=100, blank=True)
+    street = models.CharField(max_length=100, blank=True)
+    locality = models.CharField(max_length=100, blank=True)
+    # Shiprocket pickup customization (optional override for sellers)
+    custom_pickup_name = models.CharField(max_length=100, blank=True, null=True)  # Optional
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
+    
+    # Security & verification
     is_email_verified = models.BooleanField(default=False)
     email_token = models.CharField(max_length=100, null=True, blank=True)
     last_password_reset = models.DateTimeField(null=True, blank=True)
+   
+  
     
 
     def __str__(self):
@@ -58,26 +74,34 @@ class Cart(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     
-
 class CartItems(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE, related_name="cart_items")
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
     color_variant = models.ForeignKey(ColorVariant, on_delete=models.SET_NULL, null=True, blank=True)
     size_variant = models.ForeignKey(SizeVariant, on_delete=models.SET_NULL, null=True, blank=True)
-
+    quantity = models.PositiveIntegerField(default=1)  # ✅ Added for accurate pricing
 
     def get_product_price(self):
-        price = [self.product.price]
+        """
+        Returns the unit price of the product including selected color and size variants.
+        """
+        price = Decimal(self.product.price) if self.product else Decimal('0.00')
 
         if self.color_variant:
-            color_variant_price = self.color_variant.price 
-            price.append(color_variant_price)
+            price += Decimal(self.color_variant.price)
         if self.size_variant:
-            size_variant_price = self.size_variant.price 
-            price.append(size_variant_price)
-        return sum(price)
-    
+            price += Decimal(self.size_variant.price)
 
+        return price
+
+    def get_total_price(self):
+        """
+        Returns the total price for this cart item (unit price * quantity).
+        """
+        return self.get_product_price() * self.quantity
+
+    def __str__(self):
+        return f"{self.product.name} x {self.quantity}"
 
 
 

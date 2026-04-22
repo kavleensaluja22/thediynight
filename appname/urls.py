@@ -1,4 +1,4 @@
-from appname import views 
+from appname import views     
 from django.urls import path , include 
 from django.urls import path, re_path
 from django.contrib.auth import views as auth_views
@@ -21,13 +21,13 @@ def redirect_user_to_profile(request):
     return redirect("profile")
 from django.shortcuts import redirect
 urlpatterns = [
-
+   path('api/categories/', views.get_categories, name='get_categories'),
 path('user_login',views.user_login,name="user_login"),
 path('sign',views.sign,name="sign"),
 path('remove_cart', views.remove_cart, name="remove_cart"),
 path('get_price/', views.get_price, name='get_price'),
 path('product/<uuid:product_uid>/', views.product_detail, name='product_detail'),
-path('track', views.track, name='track'),
+
 # path('user', views.user, name='user'),
 path('update_quantity/<int:cart_id>/', views.update_quantity, name='update_quantity'),
 path('user/', views.redirect_user_to_profile, name='redirect_user_to_profile'),
@@ -72,6 +72,8 @@ path('remove_product/<uuid:product_id>/', views.remove_product, name='remove_pro
 
     path('create-seller-payment/', CreateSellerPaymentView.as_view(), name='create_seller_payment'),
     path('seller/payment/callback/', SellerPaymentCallbackView.as_view(), name='seller_payment_callback'),
+path('sellerdashboard/', views.sellerdashboard, name='sellerdashboard'),
+
 
 
  re_path(

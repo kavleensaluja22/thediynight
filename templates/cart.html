@@ -1,4 +1,4 @@
-{% load static %}
+{% comment %} {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -346,39 +346,64 @@
       animation-delay: 0.2s;
     }
     
-    /* Button ripple effect */
-    .checkout-btn::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 5px;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.5);
-      opacity: 0;
-      border-radius: 100%;
-      transform: scale(1, 1) translate(-50%);
-      transform-origin: 50% 50%;
+    .checkout-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      background-color: #6daabd;
+      color: white;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+      text-decoration: none;
     }
     
-    .checkout-btn:focus:not(:active)::after {
-      animation: ripple 1s ease-out;
+    .checkout-button:hover {
+      background-color: #5a94a1;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12);
     }
     
-    @keyframes ripple {
-      0% {
-        transform: scale(0, 0);
-        opacity: 0.5;
-      }
-      20% {
-        transform: scale(25, 25);
-        opacity: 0.3;
-      }
-      100% {
-        opacity: 0;
-        transform: scale(40, 40);
-      }
+    .checkout-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(109, 170, 189, 0.4);
     }
+
+
+    .checkout-button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem; /* equivalent to mt-6 */
+    }
+    
+    .checkout-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      background-color: #6daabd;
+      color: white;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+      text-decoration: none;
+    }
+    
+    .checkout-button:hover {
+      background-color: #5a94a1;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12);
+    }
+    
+    .checkout-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(109, 170, 189, 0.4);
+    }
+    
+    
     
   </style>
 </head>
@@ -386,200 +411,1319 @@
     <header class="header">
         <a href="/" class="logo">@thediynight</a>
         <nav class="nav">
-            <a href="/" class="nav-item">Shop</a>
-            {% comment %} <a href="/track" class="nav-item">Track</a> {% endcomment %}
-            <a href="/user/" class="nav-item">
-                {% if request.user.is_authenticated %}
-                    {{ request.user.profile.name|default:request.user.username }}
-                {% else %}
-                    User
-                {% endif %}
-            </a>
-            <div class="cart-icon">
-                <button class="nav-item" id="cart-btn">Cart</button>           
-                <span class="cart-count" id="cart-count">{{ cart_count }}</span>
-
-            </div>
-        </nav>
+          <a href="/" class="nav-item">Shop</a>
+          <a href="/track/" class="nav-item">Track</a>
+          <a href="/user/" class="nav-item">
+              {% if request.user.is_authenticated %}
+                  {{ request.user.profile.name|default:request.user.username }}
+              {% else %}
+                  User
+              {% endif %}
+          </a>
+          <div class="cart-icon">
+              <button class="nav-item" id="cart-btn">Cart</button>
+              <span class="cart-count" id="cart-count">{{ cart_count }}</span>
+          </div>
+      </nav>
     </header>
-    <body class="shopping-cart-container min-h-screen p-6">
-        <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md border-t-4" style="border-color: #6daabd;">
-          {% block content %}
-          <h1 class="text-3xl font-bold mb-6 text-[#6daabd]">Shopping Cart</h1>
+  <div class="shopping-cart-container min-h-screen p-6">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md border-t-4" style="border-color: #6daabd;">
+    <h1 class="text-3xl font-bold mb-6 text-[#6daabd]">Shopping Cart</h1>
+
+    {% if cart_items %}
+    <div class="cart-items-wrapper">
+      {% for item in cart_items %}
+      <div class="cart-item flex gap-4 p-4 rounded border shadow-sm bg-gray-50">
+        <img src="{{ item.image|default:'/static/images/placeholder.png' }}" alt="{{ item.name }}" class="w-24 h-24 object-cover rounded" />
+        <div class="flex-1">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold">{{ item.name }}</h3>
+            <button class="remove-item text-sm text-red-600" data-item-id="{{ item.id }}">Remove</button>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 item-options">
+            <!-- Size -->
+            <div>
+              <label class="block font-medium text-sm text-gray-700 mb-1">Size</label>
+              <div class="flex gap-2 flex-wrap">
+                {% for size in item.available_sizes %}
+                <button class="size-selector px-2 py-1 border rounded text-sm {% if size == item.selected_size %}selected{% endif %}" data-item-id="{{ item.id }}" data-size="{{ size }}">{{ size }}</button>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Color -->
+            <div>
+              <label class="block font-medium text-sm text-gray-700 mb-1">Color</label>
+              <div class="flex gap-2 flex-wrap">
+                {% for color in item.available_colors %}
+                <button class="color-selector px-2 py-1 border rounded text-sm {% if color == item.selected_color %}selected{% endif %}" data-item-id="{{ item.id }}" data-color="{{ color }}">{{ color }}</button>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Quantity -->
+            <div class="flex items-center gap-2 quantity-selector">
+              <button class="quantity-btn px-2 py-1 border rounded" data-action="decrease" data-item-id="{{ item.id }}">-</button>
+              <div class="quantity-value w-6 text-center">{{ item.quantity }}</div>
+              <button class="quantity-btn px-2 py-1 border rounded" data-action="increase" data-item-id="{{ item.id }}">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Cart Summary -->
+      <div class="cart-summary mt-8 p-4 border-t">
+        <div class="flex justify-between text-xl font-semibold mb-4">
+          <span>Total</span>
+          <span id="cart-subtotal" class="text-[#6daabd]">₹{{ total }}</span>
+        </div>
+
+        <!-- ✅ Proceed to Checkout Button -->
+        <div class="checkout-button-container">
+          <a href="/checkout/" class="checkout-button">
+            Proceed to Checkout
+          </a>
+        </div>
+        
+        
+
+    </div>
+    {% else %}
+    <!-- ✅ Styled Empty Cart Message -->
+    <div class="text-center py-12 text-gray-600">
+      <img src="/static/images/empty-cart.svg" alt="Empty Cart" class="mx-auto w-40 mb-6">
+      <h2 class="text-2xl font-semibold">Your cart is empty</h2>
+      <p class="mt-2 text-gray-500">Looks like you haven't added anything to your cart yet.</p>
+      <a href="/" class="mt-6 inline-block px-6 py-2 bg-[#6daabd] text-white font-medium rounded hover:bg-[#5a94a1] transition">Shop Now</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+
+    
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
       
-          {% if cart_items %}
-          <div class="space-y-6">
-            {% for item in cart_items %}
-            <div class="cart-item flex gap-4 p-4 rounded border shadow-sm bg-gray-50">
-              <img src="{{ item.image|default:'/static/images/placeholder.png' }}" alt="{{ item.name }}" class="w-24 h-24 object-cover rounded" />
+        const csrftoken = getCookie("csrftoken");
       
-              <div class="flex-1">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <h3 class="text-lg font-semibold">{{ item.name }}</h3>
-                    <div class="item-price text-[#6daabd] font-bold text-lg">₹{{ item.price }}</div>
-                  </div>
-                  <button class="remove-item" data-item-id="{{ item.id }}">Remove</button>
+        // ✅ Update cart count
+        function updateCartCount(count) {
+          const cartCountElement = document.getElementById("cart-count");
+          if (cartCountElement) {
+            cartCountElement.textContent = count;
+          }
+        }
+      
+        // 🗑️ Remove item
+        document.querySelectorAll(".remove-item").forEach(button => {
+          button.addEventListener("click", () => {
+            const itemId = button.dataset.itemId;
+            fetch('/remove-item/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+              },
+              body: JSON.stringify({ item_id: itemId }),
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                const itemElement = button.closest(".cart-item");
+                if (itemElement) itemElement.remove();
+      
+                // Update total and cart count
+                document.querySelector("#cart-subtotal").textContent = `₹${data.cart_total}`;
+                updateCartCount(data.cart_count);
+      
+                // Optional: check if all items removed
+                if (document.querySelectorAll(".cart-item").length === 0) {
+                  document.querySelector(".shopping-cart-container").innerHTML = "<p>Your cart is empty.</p>";
+                }
+              }
+            });
+          });
+        });
+      
+        // 🔢 Quantity change
+        document.querySelectorAll(".quantity-btn").forEach(button => {
+          button.addEventListener("click", () => {
+            const itemId = button.dataset.itemId;
+            const action = button.dataset.action;
+            const container = button.closest(".cart-item");
+            const quantityDisplay = container.querySelector(".quantity-value");
+            let quantity = parseInt(quantityDisplay.textContent);
+      
+            if (action === "increase" && quantity < 99) quantity += 1;
+            if (action === "decrease" && quantity > 1) quantity -= 1;
+      
+            fetch("/update-quantity/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrftoken,
+              },
+              body: new URLSearchParams({
+                item_id: itemId,
+                quantity: quantity,
+              }),
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                quantityDisplay.textContent = data.updated_quantity;
+                document.querySelector("#cart-subtotal").textContent = `₹${data.cart_total}`;
+                updateCartCount(data.cart_count);
+              } else {
+                alert("Update failed: " + data.error);
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating quantity:", error);
+            });
+          });
+        });
+      
+        // 👕 Size selection
+        document.querySelectorAll('.size-selector').forEach(button => {
+          button.addEventListener('click', () => {
+            const itemId = button.dataset.itemId;
+            const size = button.dataset.size;
+      
+            fetch('/update-size/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+              },
+              body: JSON.stringify({ item_id: itemId, size: size }),
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                document.querySelectorAll(`[data-item-id="${itemId}"].size-selector`).forEach(b => b.classList.remove('selected'));
+                button.classList.add('selected');
+                const container = button.closest('.cart-item');
+                container.querySelector('.item-price').textContent = `₹${data.updated_price} x ${data.quantity} = ₹${data.item_total}`;
+                updateCartCount(data.cart_count);
+              }
+            });
+          });
+        });
+      
+        // 🎨 Color selection
+        document.querySelectorAll('.color-selector').forEach(button => {
+          button.addEventListener('click', () => {
+            const itemId = button.dataset.itemId;
+            const color = button.dataset.color;
+      
+            fetch('/update-color/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+              },
+              body: JSON.stringify({ item_id: itemId, color: color }),
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                document.querySelectorAll(`[data-item-id="${itemId}"].color-selector`).forEach(b => b.classList.remove('selected'));
+                button.classList.add('selected');
+                const container = button.closest('.cart-item');
+                container.querySelector('.item-price').textContent = `₹${data.updated_price} x ${data.quantity} = ₹${data.item_total}`;
+                updateCartCount(data.cart_count);
+              }
+            });
+          });
+        });
+      
+        // 🛒 Cart button
+        document.getElementById('cart-btn').addEventListener('click', () => {
+          window.location.href = "/cart/";
+        });
+      });
+      </script>
+      
+  
+
+  
+</body>
+</html> {% endcomment %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shopping Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="{% static 'home.css' %}">
+  <style>
+
+    /* General styling */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    /* Container */
+    .container {
+      min-height: 100vh;
+    }
+
+    
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #6daabd;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .logo:hover {
+      color: #5a94a1;
+    }
+
+    .cart-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+     
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    /* Shopping cart container */
+    .shopping-cart-container {
+      background-color: #f8f9fa;
+      min-height: calc(100vh - 80px);
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    /* Cart wrapper */
+    .max-w-4xl {
+      max-width: 64rem;
+      margin: 0 auto;
+    }
+
+    /* Main cart panel */
+    .rounded-lg {
+      border-radius: 0.5rem;
+    }
+
+    .shadow-md {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .bg-white {
+      background-color: #fff;
+    }
+
+    .p-6 {
+      padding: 1rem;
+    }
+
+    .border-t-4 {
+      border-top-width: 4px;
+      border-top-color: #6daabd !important;
+    }
+
+    /* Cart title */
+    .text-3xl {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .mb-6 {
+      margin-bottom: 1rem;
+    }
+
+    .text-\[\#6daabd\] {
+      color: #6daabd;
+    }
+
+    /* Cart item spacing */
+    .cart-items-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* Cart item */
+    .cart-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      background-color: #f9fafb;
+      transition: all 0.3s ease;
+    }
+
+    .cart-item:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Product image */
+    .w-24 {
+      width: 4rem;
+      min-width: 4rem;
+    }
+
+    .h-24 {
+      height: 4rem;
+    }
+
+    .object-cover {
+      object-fit: cover;
+    }
+
+    .rounded {
+      border-radius: 0.375rem;
+    }
+
+    /* Item details */
+    .flex-1 {
+      flex: 1 1 0%;
+      min-width: 0;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    /* Item header */
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+      gap: 0.5rem;
+    }
+
+    /* Item name */
+    .text-lg {
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .font-semibold {
+      font-weight: 600;
+    }
+
+    /* Item price */
+    .item-price {
+      color: #6daabd;
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    /* Remove button */
+    .remove-item {
+      background-color: #ef4444;
+      color: white;
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+      min-height: 32px;
+    }
+
+    .remove-item:hover {
+      background-color: #dc2626;
+    }
+
+    /* Item options section - ALWAYS HORIZONTAL */
+    .mt-4 {
+      margin-top: 0.75rem;
+    }
+
+    .grid {
+      display: grid;
+    }
+
+    /* Force 3 columns on ALL screen sizes */
+    .item-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    /* Option groups */
+    .option-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    /* Option labels */
+    .font-medium {
+      font-weight: 500;
+    }
+
+    .text-sm {
+      font-size: 0.75rem;
+      line-height: 1.2;
+    }
+
+    .text-gray-700 {
+      color: #374151;
+    }
+
+    .mb-1 {
+      margin-bottom: 0.125rem;
+    }
+
+    /* Option selectors */
+    .option-buttons {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+
+    /* Size and color buttons - Compact for mobile */
+    .size-selector,
+    .color-selector {
+      padding: 0.375rem 0.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      background-color: white;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 32px;
+      min-width: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .size-selector:hover,
+    .color-selector:hover {
+      border-color: #6daabd;
+      color: #6daabd;
+    }
+
+    .selected {
+      background-color: #6daabd;
+      color: white;
+      border-color: #6daabd;
+    }
+
+    /* Quantity selector - Compact horizontal layout */
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      justify-content: center;
+    }
+
+    .quantity-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.25rem;
+      background-color: white;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.875rem;
+      font-weight: bold;
+    }
+
+    .quantity-btn:hover:not([disabled]) {
+      border-color: #6daabd;
+      color: #6daabd;
+    }
+
+    .quantity-btn[disabled] {
+      background-color: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .quantity-value {
+      width: 1.5rem;
+      text-align: center;
+      font-weight: 500;
+      color: #374151;
+      font-size: 0.875rem;
+    }
+
+    /* Cart summary */
+    .cart-summary {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    /* Total section */
+    .text-xl {
+      font-size: 1.125rem;
+      line-height: 1.5;
+    }
+
+    .total-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .total-amount {
+      color: #6daabd;
+    }
+
+    /* Checkout button container */
+    .checkout-button-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .checkout-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      background-color: #6daabd;
+      color: white;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+      text-decoration: none;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .checkout-button:hover {
+      background-color: #5a94a1;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .checkout-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(109, 170, 189, 0.4);
+    }
+
+    /* Empty cart message */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-gray-500 {
+      color: #6b7280;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #6b7280;
+    }
+
+    .empty-cart img {
+      width: 120px;
+      height: auto;
+      margin: 0 auto 1rem;
+    }
+
+    .empty-cart h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+
+    .empty-cart p {
+      margin-bottom: 1.5rem;
+      color: #6b7280;
+    }
+
+    .shop-now-btn {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      background-color: #6daabd;
+      color: white;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .shop-now-btn:hover {
+      background-color: #5a94a1;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cart-item {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .cart-item:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .cart-item:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    /* Tablet and larger screens */
+    @media (min-width: 768px) {
+      .header {
+        padding: 1rem 2rem;
+        flex-wrap: nowrap;
+      }
+
+      .nav {
+        gap: 2rem;
+      }
+
+      .nav-item {
+        font-size: 1rem;
+      }
+
+      .cart-count {
+        width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+      }
+
+      .shopping-cart-container {
+        padding: 2rem;
+      }
+
+      .p-6 {
+        padding: 2rem;
+      }
+
+      .text-3xl {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+      }
+
+      .mb-6 {
+        margin-bottom: 1.5rem;
+      }
+
+      .cart-items-wrapper {
+        gap: 1.5rem;
+      }
+
+      .cart-item {
+        gap: 1rem;
+      }
+
+      .w-24 {
+        width: 6rem;
+        min-width: 6rem;
+      }
+
+      .h-24 {
+        height: 6rem;
+      }
+
+      .text-lg {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+      }
+
+      .item-price {
+        font-size: 1.125rem;
+      }
+
+      .remove-item {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+
+      .mt-4 {
+        margin-top: 1rem;
+      }
+
+      .item-options {
+        gap: 1rem;
+      }
+
+      .text-sm {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+      }
+
+      .option-buttons {
+        gap: 0.5rem;
+      }
+
+      .size-selector,
+      .color-selector {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        min-height: 36px;
+      }
+
+      .quantity-btn {
+        width: 32px;
+        height: 32px;
+      }
+
+      .quantity-value {
+        font-size: 1rem;
+      }
+
+      .text-xl {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+      }
+    }
+
+    /* Very small screens - extra compact */
+    @media (max-width: 480px) {
+      .cart-item {
+        padding: 0.75rem;
+        gap: 0.5rem;
+      }
+
+      .w-24 {
+        width: 3rem;
+        min-width: 3rem;
+      }
+
+      .h-24 {
+        height: 3rem;
+      }
+
+      .text-lg {
+        font-size: 0.875rem;
+      }
+
+      .item-options {
+        gap: 0.375rem;
+      }
+
+      .size-selector,
+      .color-selector {
+        padding: 0.25rem 0.375rem;
+        font-size: 0.7rem;
+        min-height: 28px;
+        min-width: 28px;
+      }
+
+      .quantity-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+      }
+
+      .quantity-value {
+        font-size: 0.75rem;
+      }
+
+      .text-sm {
+        font-size: 0.7rem;
+      }
+
+      .remove-item {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+        min-height: 28px;
+      }
+    }
+
+    /* Focus states for accessibility */
+    .nav-item:focus,
+    .remove-item:focus,
+    .size-selector:focus,
+    .color-selector:focus,
+    .quantity-btn:focus,
+    .checkout-button:focus,
+    .shop-now-btn:focus {
+      outline: 2px solid #6daabd;
+      outline-offset: 2px;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      .cart-item {
+        border: 2px solid #333;
+      }
+
+      .size-selector.selected,
+      .color-selector.selected {
+        border: 2px solid #000;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #6daabd;
+      text-decoration: none;
+    }
+    
+    .nav {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-item {
+      font-size: 1.2rem;
+      color: #374151;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    
+    .nav-item:hover {
+      color: #6daabd;
+    }
+
+    
+    @media (min-width: 768px) {
+      .logo {
+        text-align: left;
+      }
+    }
+    @media (max-width: 640px) {
+        .logo {
+          text-align: left !important;
+          margin-left: 0.7rem;
+        }
+      }
+      @media (max-width: 640px) {
+        .user-link {
+          display: inline-block;
+          max-width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .nav {
+        display: flex;
+        justify-content: flex-end; /* Push all nav items to the right */
+        align-items: center;
+        gap: 20px; /* Space between items */
+        width: 100%; /* Ensures full row occupation */
+      }
+      
+  </style>
+</head>
+<body>
+<div class="container">
+  <header class="header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+    <div style="flex: 1;">
+      <a href="/" class="logo" style="
+        display: block;
+        font-weight: bold;
+        font-size: 1.40rem;
+        color: #6daabd;
+        text-decoration: none;
+        text-align: left;
+        margin-left: 0.7rem;">
+        @thediynight
+      </a>
+    </div>
+  
+    <nav class="nav" style="
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 20px;">
+      
+      <a href="/" class="nav-item">Shop</a>
+      <a href="/track/" class="nav-item">Track</a>
+      <a href="/user/" class="nav-item user-link" style="
+        display: inline-block;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1.07rem;
+        color: #333;
+        text-decoration: none;
+        padding: 0.5rem 1rem;">
+        {% if request.user.is_authenticated %}
+          {{ request.user.profile.name|default:request.user.username }}
+        {% else %}
+          User
+        {% endif %}
+      </a> 
+  
+      <div class="cart-icon">
+        <button class="nav-item" id="cart-btn">Cart</button>
+        <span class="cart-count" id="cart-count">{{ cart_count }}</span>
+      </div>
+    </nav>
+  </header>
+  
+  <div class="shopping-cart-container">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md border-t-4" style="border-color: #6daabd;">
+      <h1 class="text-3xl font-bold mb-6 text-[#6daabd]">Shopping Cart</h1>
+
+      {% if cart_items %}
+      <div class="cart-items-wrapper">
+        {% for item in cart_items %}
+        <article class="cart-item">
+          <img src="{{ item.image|default:'/static/images/placeholder.png' }}" alt="{{ item.name }}" class="w-24 h-24 object-cover rounded" />
+          <div class="flex-1">
+            <div class="item-header">
+              <div>
+                <h3 class="text-lg font-semibold">{{ item.name }}</h3>
+                <div class="item-price">₹{{ item.price }}</div>
+              </div>
+              <button class="remove-item" data-item-id="{{ item.id }}" aria-label="Remove {{ item.name }} from cart">Remove</button>
+            </div>
+
+            <div class="mt-4 item-options">
+              <!-- Size -->
+              <div class="option-group">
+                <label class="font-medium text-sm text-gray-700 mb-1">Size</label>
+                <div class="option-buttons">
+                  {% for size in item.available_sizes %}
+                  <button class="size-selector {% if size == item.selected_size %}selected{% endif %}" data-item-id="{{ item.id }}" data-size="{{ size }}" aria-label="Select size {{ size }}">{{ size }}</button>
+                  {% endfor %}
                 </div>
-      
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 item-options">
-                  <div>
-                    <label class="block font-medium text-sm text-gray-700 mb-1">Size</label>
-                    <div class="flex gap-2 flex-wrap">
-                      {% for size in item.available_sizes %}
-                      <button class="size-selector px-2 py-1 border rounded text-sm {% if size == item.selected_size %}selected{% endif %}" data-item-id="{{ item.id }}" data-size="{{ size }}">{{ size }}</button>
-                      {% endfor %}
-                    </div>
-                  </div>
-      
-                  <div>
-                    <label class="block font-medium text-sm text-gray-700 mb-1">Color</label>
-                    <div class="flex gap-2 flex-wrap">
-                      {% for color in item.available_colors %}
-                      <button class="color-selector px-2 py-1 border rounded text-sm {% if color == item.selected_color %}selected{% endif %}" data-item-id="{{ item.id }}" data-color="{{ color }}">{{ color }}</button>
-                      {% endfor %}
-                    </div>
-                  </div>
-      
-                  <div>
-                    <label class="block font-medium text-sm text-gray-700 mb-1">Quantity</label>
-                    <div class="flex items-center gap-2 quantity-selector">
-                      <button class="quantity-btn px-2 py-1 border rounded" data-action="decrease" data-item-id="{{ item.id }}" {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
-                      <div class="quantity-value w-6 text-center">{{ item.quantity }}</div>
-                      <button class="quantity-btn px-2 py-1 border rounded" data-action="increase" data-item-id="{{ item.id }}" {% if item.quantity >= 99 %}disabled{% endif %}>+</button>
-                    </div>
-                  </div>
+              </div>
+
+              <!-- Color -->
+              <div class="option-group">
+                <label class="font-medium text-sm text-gray-700 mb-1">Color</label>
+                <div class="option-buttons">
+                  {% for color in item.available_colors %}
+                  <button class="color-selector {% if color == item.selected_color %}selected{% endif %}" data-item-id="{{ item.id }}" data-color="{{ color }}" aria-label="Select color {{ color }}">{{ color }}</button>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Quantity -->
+              <div class="option-group">
+                <label class="font-medium text-sm text-gray-700 mb-1">Qty</label>
+                <div class="quantity-selector">
+                  <button class="quantity-btn" data-action="decrease" data-item-id="{{ item.id }}" aria-label="Decrease quantity">−</button>
+                  <span class="quantity-value">{{ item.quantity }}</span>
+                  <button class="quantity-btn" data-action="increase" data-item-id="{{ item.id }}" aria-label="Increase quantity">+</button>
                 </div>
               </div>
             </div>
-            {% endfor %}
           </div>
-      
-          <div class="cart-summary mt-8 p-4 border-t">
-            <div class="flex justify-between text-xl font-semibold">
-              <span>Total</span>
-              <span class="text-[#6daabd]">₹{{ total }}</span>
-            </div>
-            <a href="{% url 'checkout' %}" class="checkout-btn mt-4 w-full py-2 rounded font-semibold block text-center" style="text-decoration: none;">Proceed to Checkout</a>
+        </article>
+        {% endfor %}
 
-
+        <!-- Cart Summary -->
+        <section class="cart-summary">
+          <div class="total-section">
+            <span class="text-xl font-semibold">Total</span>
+            <span id="cart-subtotal" class="text-xl font-semibold total-amount">₹{{ total }}</span>
           </div>
-      
-          {% else %}
-          <div class="text-center text-gray-500 text-xl mt-10">Your cart is empty</div>
-          {% endif %}
-          {% endblock %}
-        </div>
+
+          <div class="checkout-button-container">
+            <a href="/checkout/" class="checkout-button">
+              Proceed to Checkout
+            </a>
+          </div>
+        </section>
+
+      </div>
+      {% else %}
+      <!-- Empty Cart Message -->
+      <div class="empty-cart">
+        {% comment %} <img src="/static/images/empty-cart.svg" alt="Empty Cart" /> {% endcomment %}
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven't added anything to your cart yet.</p>
+        <a href="/" class="shop-now-btn">Shop Now</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
 <script>
-    function getCSRFToken() {
-        const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
-        return cookie ? cookie.split('=')[1] : '';
+  document.addEventListener("DOMContentLoaded", function () {
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
       }
-  
-      const csrftoken = getCSRFToken();
-  
-      // Remove item
-       document.querySelectorAll('.remove-item').forEach(button => {
-        button.addEventListener('click', () => {
-          const itemId = button.dataset.itemId;
-          fetch('/remove-item/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({ item_id: itemId }),
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) location.reload();
-          });
+      return cookieValue;
+    }
+
+    const csrftoken = getCookie("csrftoken");
+
+    // Update cart count
+    function updateCartCount(count) {
+      const cartCountElement = document.getElementById("cart-count");
+      if (cartCountElement) {
+        cartCountElement.textContent = count;
+      }
+    }
+
+    // Remove item with improved feedback
+    document.querySelectorAll(".remove-item").forEach(button => {
+      button.addEventListener("click", () => {
+        const itemId = button.dataset.itemId;
+        const itemElement = button.closest(".cart-item");
+
+        // Add removing animation
+        itemElement.style.opacity = '0.5';
+        button.disabled = true;
+        button.textContent = 'Removing...';
+
+        fetch('/remove-item/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+          },
+          body: JSON.stringify({ item_id: itemId }),
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            itemElement.style.opacity = '0';
+            itemElement.style.transform = 'translateX(-100%)';
+
+            setTimeout(() => {
+              itemElement.remove();
+
+              // Update total and cart count
+              const subtotalElement = document.querySelector("#cart-subtotal");
+              if (subtotalElement) {
+                subtotalElement.textContent = `₹${data.cart_total}`;
+              }
+              updateCartCount(data.cart_count);
+
+              // Check if all items removed
+              if (document.querySelectorAll(".cart-item").length === 0) {
+                location.reload(); // Reload to show empty cart state
+              }
+            }, 300);
+          } else {
+            // Reset button state on error
+            itemElement.style.opacity = '1';
+            button.disabled = false;
+            button.textContent = 'Remove';
+            alert('Failed to remove item. Please try again.');
+          }
+        })
+        .catch(error => {
+          console.error('Error removing item:', error);
+          // Reset button state on error
+          itemElement.style.opacity = '1';
+          button.disabled = false;
+          button.textContent = 'Remove';
+          alert('Failed to remove item. Please try again.');
         });
       });
-  
-      // Update quantity
-      document.querySelectorAll('.quantity-btn').forEach(button => {
-        button.addEventListener('click', () => {
-          const itemId = button.dataset.itemId;
-          const action = button.dataset.action;
-          const container = button.closest('.cart-item');
-          const quantityDisplay = container.querySelector('.quantity-value');
-          let quantity = parseInt(quantityDisplay.textContent);
-  
-          if (action === 'increase' && quantity < 99) quantity += 1;
-          if (action === 'decrease' && quantity > 1) quantity -= 1;
-  
-          fetch('/update-quantity/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'X-CSRFToken': csrftoken,
-            },
-            body: new URLSearchParams({
-              item_id: itemId,
-              quantity: quantity
-            })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) location.reload();
-          });
-        });
-      });
-  
-      // Size selection
-      document.querySelectorAll('.size-selector').forEach(button => {
-        button.addEventListener('click', () => {
-          const itemId = button.dataset.itemId;
-          const size = button.dataset.size;
-  
-          fetch('/update-size/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({ item_id: itemId, size: size }),
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              document.querySelectorAll(`[data-item-id="${itemId}"].size-selector`).forEach(b => b.classList.remove('selected'));
-              button.classList.add('selected');
-              const container = button.closest('.cart-item');
-              container.querySelector('.item-price').textContent = `₹${data.updated_price}`;
+    });
+
+    // Quantity change
+    document.querySelectorAll(".quantity-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const itemId = button.dataset.itemId;
+        const action = button.dataset.action;
+        const container = button.closest(".cart-item");
+        const quantityDisplay = container.querySelector(".quantity-value");
+        let quantity = parseInt(quantityDisplay.textContent);
+
+        if (action === "increase" && quantity < 99) quantity += 1;
+        if (action === "decrease" && quantity > 1) quantity -= 1;
+
+        fetch("/update-quantity/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrftoken,
+          },
+          body: new URLSearchParams({
+            item_id: itemId,
+            quantity: quantity,
+          }),
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            quantityDisplay.textContent = data.updated_quantity;
+            const subtotalElement = document.querySelector("#cart-subtotal");
+            if (subtotalElement) {
+              subtotalElement.textContent = `₹${data.cart_total}`;
             }
-          });
+            updateCartCount(data.cart_count);
+          } else {
+            alert("Update failed: " + data.error);
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating quantity:", error);
+          alert("Failed to update quantity. Please try again.");
         });
       });
-  
-      // Color selection
-      document.querySelectorAll('.color-selector').forEach(button => {
-        button.addEventListener('click', () => {
-          const itemId = button.dataset.itemId;
-          const color = button.dataset.color;
-  
-          fetch('/update-color/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({ item_id: itemId, color: color }),
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              document.querySelectorAll(`[data-item-id="${itemId}"].color-selector`).forEach(b => b.classList.remove('selected'));
-              button.classList.add('selected');
-              const container = button.closest('.cart-item');
-              container.querySelector('.item-price').textContent = `₹${data.updated_price}`;
-            }
-          });
+    });
+
+    // Size selection
+    document.querySelectorAll('.size-selector').forEach(button => {
+      button.addEventListener('click', () => {
+        const itemId = button.dataset.itemId;
+        const size = button.dataset.size;
+
+        fetch('/update-size/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+          },
+          body: JSON.stringify({ item_id: itemId, size: size }),
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.querySelectorAll(`[data-item-id="${itemId}"].size-selector`).forEach(b => b.classList.remove('selected'));
+            button.classList.add('selected');
+            updateCartCount(data.cart_count);
+          } else {
+            alert("Failed to update size. Please try again.");
+          }
+        })
+        .catch(error => {
+          console.error('Error updating size:', error);
+          alert("Failed to update size. Please try again.");
         });
       });
-  
-  </script>
-  
+    });
+
+    // Color selection
+    document.querySelectorAll('.color-selector').forEach(button => {
+      button.addEventListener('click', () => {
+        const itemId = button.dataset.itemId;
+        const color = button.dataset.color;
+
+        fetch('/update-color/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+          },
+          body: JSON.stringify({ item_id: itemId, color: color }),
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.querySelectorAll(`[data-item-id="${itemId}"].color-selector`).forEach(b => b.classList.remove('selected'));
+            button.classList.add('selected');
+            updateCartCount(data.cart_count);
+          } else {
+            alert("Failed to update color. Please try again.");
+          }
+        })
+        .catch(error => {
+          console.error('Error updating color:', error);
+          alert("Failed to update color. Please try again.");
+        });
+      });
+    });
+
+    // Cart button
+    const cartBtn = document.getElementById('cart-btn');
+    if (cartBtn) {
+      cartBtn.addEventListener('click', () => {
+        window.location.href = "/cart/";
+      });
+    }
+  });
+</script>
+
 </body>
 </html>

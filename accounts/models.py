@@ -44,13 +44,16 @@ def generate_unique_slug(name):
 
 
 class Product(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="products")
     uid = models.UUIDField(default=uuid4, editable=False, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="products")  # seller
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now_add=True)
+
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
     product_name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, null=True, blank=True)
+
+    # Shipping specs
     weight = models.FloatField(help_text="Weight in kilograms")
     length = models.FloatField(help_text="Length in cm")
     breadth = models.FloatField(help_text="Breadth in cm")
@@ -58,11 +61,10 @@ class Product(models.Model):
     price = models.IntegerField()
     pincode = models.IntegerField()
     product_description = models.TextField()
+
+    # Variants
     color_variants = models.ManyToManyField('ColorVariant', related_name="products", blank=True)
     size_variants = models.ManyToManyField('SizeVariant', related_name="products", blank=True)
-    seller_email = models.EmailField(default='default@example.com')
-    seller_name = models.CharField(max_length=255, blank=True, null=True)
-    seller_phone = models.CharField(max_length=15, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -95,7 +97,12 @@ class Product(models.Model):
             return 0
         return min(5, total_views // 10)
 
-    
+    def get_main_image_url(self):
+        main_image = self.product_images.filter(is_main=True).first()
+        if main_image and main_image.image:
+            return main_image.image.url
+        return '/static/images/default_product.jpg'
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name="product_images")
@@ -175,29 +182,43 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    phone = models.CharField(max_length=15)  # ✅ Add this line
+    phone = models.CharField(max_length=15)
     address = models.TextField()
     payment_method = models.CharField(max_length=20)
     transaction_id = models.CharField(max_length=100)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
+    # Razorpay payment fields
     razorpay_order_id = models.CharField(max_length=100, null=True, blank=True)
     razorpay_payment_id = models.CharField(max_length=100, null=True, blank=True)
     razorpay_signature = models.CharField(max_length=255, null=True, blank=True)
     is_paid = models.BooleanField(default=False)
+    refund_status = models.CharField(max_length=20, null=True, blank=True)
+
+    # Shipping tracking summary (copied from SubOrder)
     selected_courier = models.CharField(max_length=255, blank=True, null=True)
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    shiprocket_order_id = models.CharField(max_length=100, blank=True, null=True)
+    shipment_id = models.CharField(max_length=100, blank=True, null=True)
+    awb_code = models.CharField(max_length=100, blank=True, null=True)
     estimated_delivery = models.IntegerField(null=True, blank=True)  # in days
+    is_delivered = models.BooleanField(default=False)
+    delivery_date = models.DateTimeField(null=True, blank=True)
+    delivery_status_snapshot = models.TextField(null=True, blank=True)
+
+    # Order status
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
 
     def __str__(self):
         return f"Order {self.id} by {self.name}"
+
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)  # Link to Product
     quantity = models.PositiveIntegerField()
+    suborder = models.ForeignKey("SubOrder", on_delete=models.CASCADE, related_name="items", null=True, blank=True) 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     seller_name = models.CharField(max_length=255, blank=True, null=True)
     seller_email = models.EmailField(blank=True, null=True)
@@ -240,7 +261,11 @@ class SavedCartItem(models.Model):
         base_price = self.product.price
         size_price = self.size_variant.price if self.size_variant else 0
         color_price = self.color_variant.price if self.color_variant else 0
-        return (base_price + size_price + color_price) * self.quantity
+        return base_price + size_price + color_price
+
+    def get_total_price(self):
+       return self.get_price() * self.quantity
+ 
 
 
 
@@ -287,11 +312,59 @@ class PromoCode(models.Model):
 from django.db import models
 from django.contrib.auth.models import User
 
-class SellerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=15)
-    address = models.TextField()
-    aadhar_number = models.CharField(max_length=12)
-    pan_number = models.CharField(max_length=10)
-    is_kyc_verified = models.BooleanField(default=False)
+# class SellerProfile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     phone = models.CharField(max_length=15)
+#     address = models.TextField()
+#     aadhar_number = models.CharField(max_length=12)
+#     pan_number = models.CharField(max_length=10)
+#     is_kyc_verified = models.BooleanField(default=False)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+from django.utils import timezone
+from datetime import timedelta
+
+class SubOrder(models.Model):
+    main_order = models.ForeignKey(Order, related_name='suborders', on_delete=models.CASCADE)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    shiprocket_order_id = models.CharField(max_length=100, blank=True, null=True)
+    shipment_id = models.CharField(max_length=100, blank=True, null=True)
+    awb_code = models.CharField(max_length=100, blank=True, null=True)
+    selected_courier = models.CharField(max_length=100, blank=True, null=True)
+
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    # 💰 Financial fields
+    seller_payout = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    shiprocket_deduction = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    platform_fee = models.DecimalField(max_digits=10, decimal_places=2, default=10.00)  # ₹10 platform fee
+    is_return_requested = models.BooleanField(default=False)
+    return_requested_at = models.DateTimeField(null=True, blank=True)
+    is_return_approved = models.BooleanField(default=False)
+    is_return_picked = models.BooleanField(default=False)
+    is_refunded = models.BooleanField(default=False)
+
+    STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Processing", "Processing"),
+        ("Ready to Ship", "Ready to Ship"),
+        ("Shipped", "Shipped"),
+        ("Delivered", "Delivered"),
+        ("Cancelled", "Cancelled"),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
+
+    def __str__(self):
+        return f"SubOrder {self.id} for {self.seller.username}"
+    
+    def is_return_eligible(self):
+        if self.status != 'delivered':
+           return False
+        if self.return_requested_at:
+           return False
+        if self.delivered_at:  # assuming you have this field
+            return timezone.now() <= self.delivered_at + timedelta(hours=24)
+        return False

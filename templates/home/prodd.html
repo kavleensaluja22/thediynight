@@ -426,7 +426,24 @@
     background-color: #f0f0f0;
 }
 
-        
+.logo {
+    display: block;
+    font-weight: bold;
+    font-size: 1.40rem;
+    color: #6daabd;
+    text-decoration: none;
+    text-align: left; /* Default for large screens */
+    margin-left: 0;   /* No left margin */
+  }
+  
+  /* On small screens - center the logo */
+  @media (max-width: 640px) {
+    .logo {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }     
     </style>
     <!-- Removed JavaScript from the head for better performance -->
 </head>
@@ -436,6 +453,7 @@
             <a href="/" class="logo">@thediynight</a>
             <nav class="nav">
                 <a href="/" class="nav-item">Shop</a>
+                <a href="/track/" class="nav-item">Track</a>
                 <a href="/user/" class="nav-item">
                     {% if request.user.is_authenticated %}
                         {{ request.user.profile.name|default:request.user.username }}
@@ -443,13 +461,9 @@
                         User
                     {% endif %}
                 </a>
-        
                 <div class="cart-icon">
                     <button class="nav-item" id="cart-btn">Cart</button>
-
-
-           
-                    <span class="cart-count" id="cart-count">0</span>
+                    <span class="cart-count" id="cart-count">{{ cart_count }}</span>
                 </div>
             </nav>
         </header>

@@ -5,7 +5,63 @@ from django.contrib import messages
 from django.contrib.auth.models import User 
 from django.contrib.auth import authenticate ,  logout 
 from django.contrib.auth import authenticate, login as auth_login
-from .models import ProFile 
+from .models import ProFile
+from django.db.models import Sum
+
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+# client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+import json
+import uuid
+import base64
+import logging
+from decimal import Decimal
+from django.conf import settings
+from django.http import JsonResponse
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
+from django.utils.text import slugify
+import razorpay
+
+# from .models import Category, Product, ColorVariant, SizeVariant, ProductImage
+
+# Initialize Razorpay client
+import base64
+import json
+import logging
+import uuid
+
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views import View
+from django.utils.text import slugify
+import json
+import logging
+import base64
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.utils.text import slugify
+import razorpay
+import razorpay
+import base64
+import imghdr
+from django.core.files.base import ContentFile
 from accounts.models import Product
 from .models import Cart
 from .models import CartItems
@@ -66,6 +122,28 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+
+import base64
+import uuid
+from django.core.files.base import ContentFile
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from accounts.models import Product, ColorVariant, SizeVariant, ProductImage, Category
+from django.utils.text import slugify
+import json
+import json
+import json
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import ProFile  # Adjust as needed
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+import json
+from .models import ProFile
+from base.emails import send_verification_email  # Ensure this function exists
+
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
@@ -409,8 +487,7 @@ def get_price(request):
     return JsonResponse({'price': price})
 
 def calculate_price(size_name, color_name):
-    # Logic to calculate price based on size and color
-    # This is a placeholder; you should implement your actual logic here
+
     base_price = 100  # Example base price
     size_price = 10  # Example size price adjustment
     color_price = 5  # Example color price adjustment
@@ -442,19 +519,60 @@ def product_detail(request, uid):
 
 
 
-@login_required
-def update_quantity(request, cart_id):
-    cart_item = get_object_or_404(Cart, id=cart_id)
-    action = request.GET.get('action')
-    if action == 'increase':
-        cart_item.quantity += 1
-    elif action == 'decrease' and cart_item.quantity > 1:
-        cart_item.quantity -= 1
-    cart_item.save()
-    return redirect('cart')
 
-def track(request):
-    return render(request,'home/track.html')
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from .models import CartItems
+from .models import Cart
+
+@require_POST
+
+
+
+@csrf_exempt
+def update_quantity(request):
+    if request.method == 'POST':
+        item_id = request.POST.get("item_id")
+        quantity = request.POST.get("quantity")
+
+        print("[DEBUG] Raw POST data:", request.POST)
+        print("[DEBUG] Received item_id:", item_id)
+        print("[DEBUG] Received quantity:", quantity)
+
+        if not item_id or not quantity:
+            return JsonResponse({"success": False, "error": "Missing data"}, status=400)
+
+        try:
+            quantity = int(quantity)
+
+            # FIX: Use correct model name (if your app uses SavedCartItem)
+            cart_item = CartItems.objects.get(id=item_id, cart__user=request.user)
+
+            cart_item.quantity = quantity
+            cart_item.save()
+
+            item_total = cart_item.get_total_price()
+            cart_items = CartItems.objects.filter(cart__user=request.user)
+            cart_total = sum(item.get_total_price() for item in cart_items)
+
+            return JsonResponse({
+                "success": True,
+                "updated_quantity": quantity,
+                "item_total": str(item_total),
+                "cart_total": str(cart_total)
+            })
+
+        except CartItems.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Item not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+
+
+
+
 from django.contrib.auth.views import PasswordResetView
 
 class CustomPasswordResetView(PasswordResetView):
@@ -465,18 +583,21 @@ class CustomPasswordResetView(PasswordResetView):
 def user_main(request):
     return render(request,'user_main.html')
 
-
-import base64
-import uuid
-from django.core.files.base import ContentFile
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from accounts.models import Product, ColorVariant, SizeVariant, ProductImage, Category
-from django.utils.text import slugify
-import json
+from accounts.models import Category  # Adjust the import path as needed
 
-# def user(request):
-#     return render(request,'home/user.html')
+def get_categories(request):
+    categories = Category.objects.all().values('id', 'category_name')
+    return JsonResponse(list(categories), safe=False)
+
+
+
+
+
+from django.http import JsonResponse
+
+
+
 from django.shortcuts import redirect
 def redirect_user_to_profile(request):
     return redirect("profile")
@@ -569,31 +690,6 @@ def custom_logout(request):
 
     auth_logout(request)
     return redirect('user_login')  # Redirect to your home page or desired URL
-
-
-import json
-import json
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import ProFile  # Adjust as needed
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-import json
-from .models import ProFile
-from base.emails import send_verification_email  # Ensure this function exists
-
-
-
-
-
-from django.http import JsonResponse
-
-
-
-
-
 
 
 @csrf_exempt
@@ -697,38 +793,160 @@ from accounts.models import SavedCart
 from accounts.models import Order
 
 def dashboard_view(request):
-    user = request.user  # ✅ Add this line!
+    user = request.user
     user_profile, created = ProFile.objects.get_or_create(user=user)
 
     if request.method == "POST":
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        phone = data.get("phone", "").strip()
-        address = data.get("address", "").strip()
-        coustmer_pincode = data.get("coustmer_pincode", "").strip()
-        if name:
-            user_profile.name = name
-        if phone:
-            user_profile.phone = phone
-        if address:
-            user_profile.address = address
-        if coustmer_pincode:
-            user_profile.coustmer_pincode = coustmer_pincode
+        try:
+            data = json.loads(request.body)
+            name = data.get("name", "").strip()
+            last_name = data.get("last_name", "").strip()
+            phone = data.get("phone", "").strip()
+            house_number = data.get("house_number", "").strip()
+            street = data.get("street", "").strip()
+            locality = data.get("locality", "").strip()
+            address = data.get("address", "").strip()
+            coustmer_pincode = data.get("coustmer_pincode", "").strip()
+            city = data.get("city", "").strip()
+            state = data.get("state", "").strip()
 
-        user_profile.save()
-        return JsonResponse({"success": True, "message": "Profile updated successfully."})
+            # Update profile fields if present
+            if name:
+                user_profile.name = name
+            if last_name:
+                user_profile.last_name = last_name
+            if phone:
+                user_profile.phone = phone
+            if house_number:
+                user_profile.house_number = house_number
+            if street:
+                user_profile.street = street
+            if locality:
+                user_profile.locality = locality
+            if address:
+                user_profile.address = address
+            if coustmer_pincode:
+                user_profile.coustmer_pincode = coustmer_pincode
+            if city:
+                user_profile.city = city
+            if state:
+                user_profile.state = state
+
+            user_profile.save()
+            return JsonResponse({"success": True, "message": "Profile updated successfully."})
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "message": "Invalid JSON data."}, status=400)
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
 
     orders = Order.objects.filter(user=user).prefetch_related('items').order_by("-created_at")
-    products = Product.objects.filter(user=request.user)
+    products = Product.objects.filter(user=user)
+
     return render(request, "home/user.html", {
         "user_profile": user_profile,
         "orders": orders,
         "products": products
     })
 
+from django.shortcuts import redirect
+
+from django.shortcuts import render
 
 
-    
+from django.contrib.auth.decorators import login_required
+from accounts.models import SubOrder
+
+
+
+import logging
+
+logger = logging.getLogger(__name__)
+@login_required
+def sellerdashboard(request):
+    user = request.user
+    logger.debug(f"[sellerdashboard] View accessed by user: {user.email}")
+
+    user_profile, _ = ProFile.objects.get_or_create(user=user)
+    address_form = AddressForm()
+
+    # Get seller's products
+    products = Product.objects.filter(user=user)
+    has_products = products.exists()
+    products_count = products.count()
+
+    # Attach main image URL to each product
+    for product in products:
+        main_image = product.product_images.filter(is_main=True).first()
+        product.main_image_url = main_image.image.url if main_image and main_image.image else "/media/products/default.jpg"
+
+    # Get suborders related to seller
+    seller_suborders = SubOrder.objects.filter(seller=user) \
+        .select_related('main_order', 'main_order__user__profile') \
+        .prefetch_related('items__product') \
+        .order_by("-created_at")
+
+    # Count by order status
+    pending_orders_count = seller_suborders.filter(status="Pending").count()
+    cancelled_orders_count = seller_suborders.filter(status="Cancelled").count()
+    shipped_orders_count = seller_suborders.filter(status="Shipped").count()
+
+    logger.debug(f"[sellerdashboard] Orders for {user.email} — Pending: {pending_orders_count}, Cancelled: {cancelled_orders_count}, Shipped: {shipped_orders_count}")
+
+    # Product filters
+    categories = Category.objects.all()
+    sizes = SizeVariant.objects.all()
+    colors = ColorVariant.objects.all()
+
+    return render(request, "sellerdashboard.html", {
+        "user_profile": user_profile,
+        "address_form": address_form,
+        "orders": Order.objects.filter(user=user).prefetch_related('items').order_by("-created_at"),
+        "products": products,
+        "has_products": has_products,
+        "products_count": products_count,
+        "categories": categories,
+        "sizes": sizes,
+        "colors": colors,
+        "seller_suborders": seller_suborders,
+        "pending_orders_count": pending_orders_count,
+        "cancelled_orders_count": cancelled_orders_count,
+        "shipped_orders_count": shipped_orders_count,
+    })
+# def sellerdashboard(request):
+#     """Main seller dashboard view"""
+#     # Get seller's products
+#     products = Product.objects.filter(seller=request.user)
+
+#     # Get seller's suborders
+#     seller_suborders = SubOrder.objects.filter(
+#         items__product__seller=request.user
+#     ).distinct().order_by('-created_at')
+
+#     # Calculate statistics
+#     products_count = products.count()
+#     pending_orders_count = seller_suborders.filter(status='Pending').count()
+#     ready_orders_count = seller_suborders.filter(status='Ready to Ship').count()
+#     shipped_orders_count = seller_suborders.filter(status='Shipped').count()
+#     cancelled_orders_count = seller_suborders.filter(status='Cancelled').count()
+
+#     # Get categories for the edit form
+#     categories = Category.objects.all()
+
+#     context = {
+#         'products': products,
+#         'seller_suborders': seller_suborders,
+#         'products_count': products_count,
+#         'pending_orders_count': pending_orders_count,
+#         'ready_orders_count': ready_orders_count,
+#         'shipped_orders_count': shipped_orders_count,
+#         'cancelled_orders_count': cancelled_orders_count,
+#         'categories': categories,
+#         'cart_count': 0,  # Add cart count if needed
+#     }
+
+#     return render(request, 'sellerdashboard.html', context)
+
 
 from django.contrib import messages
 
@@ -748,7 +966,7 @@ def remove_product(request, product_id):
         return JsonResponse({'message': 'Product deleted successfully'})
 
     messages.success(request, "Product deleted successfully.")
-    return redirect('redirect_user_to_profile')
+    return redirect('sellerdashboard')
 
 
 
@@ -797,79 +1015,399 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 import razorpay
 from decimal import Decimal
-# from accounts.models import SavedCart, SavedCartItem, Order
 
-# Initialize Razorpay client
+
+
+from django.conf import settings
+from django.http import JsonResponse
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from decimal import Decimal
+import requests
+
+
+
+from collections import defaultdict
+from decimal import Decimal
+import requests
+from django.conf import settings
+from django.views import View
+from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+
+from decimal import Decimal
+from collections import defaultdict
+from django.views import View
+from django.http import JsonResponse
+from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+import requests
+import logging
+
+
+
+import logging
+import requests
+from decimal import Decimal
+from django.http import JsonResponse
+from django.views import View
+from django.shortcuts import get_object_or_404
+from razorpay import Client
+from django.conf import settings
+# from .models import ProFile, SavedCart, SavedCartItem, Order
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-
+logger = logging.getLogger(__name__)
 @method_decorator(csrf_exempt, name='dispatch')
 
 
+# class CreatePaymentView(View):
+#     def post(self, request, *args, **kwargs):
+#         user = request.user
+#         profile = get_object_or_404(ProFile, user=user)
+#         delivery_pincode = profile.coustmer_pincode
 
-class CreatePaymentView(LoginRequiredMixin, View):
-    def post(self, request):
-        cart = SavedCart.objects.filter(user=request.user).first()
-        cart_items = SavedCartItem.objects.filter(cart=cart)
+#         logger.debug(f"[CreatePaymentView] Checkout POST received | User: {user.email}")
 
-        if not cart or not cart_items.exists():
-            return JsonResponse({"error": "Cart is empty"}, status=400)
+#         try:
+#             cart = SavedCart.objects.get(user=user)
+#             cart_items = SavedCartItem.objects.filter(cart=cart)
+#         except SavedCart.DoesNotExist:
+#             logger.warning(f"[CreatePaymentView] No cart found for user {user.id}")
+#             return JsonResponse({'error': 'Cart is empty'}, status=400)
 
-        # Get subtotal (before any discounts)
-        subtotal = sum(Decimal(str(item.get_price())) for item in cart_items)
+#         subtotal = sum(Decimal(item.get_total_price()) for item in cart_items).quantize(Decimal('0.01'))
+#         logger.debug(f"[CreatePaymentView] Subtotal: ₹{subtotal}")
 
-        # Get discount from session if user applied promo
-        discount_amount = Decimal(str(request.session.get('pending_discount_amount', 0)))
+#         discount = Decimal(str(request.session.get('pending_discount_amount', 0))).quantize(Decimal('0.01'))
+#         discounted_total = (subtotal - discount).quantize(Decimal('0.01'))
+#         logger.debug(f"[CreatePaymentView] Discount: ₹{discount} | Discounted Total: ₹{discounted_total}")
 
-        # Calculate total after discount
-        discounted_total = subtotal - discount_amount
+#         try:
+#             auth_res = requests.post(
+#                 "https://sr-auth.shiprocket.in/v1/external/auth/login",
+#                 json={"email": settings.SHIPROCKET_EMAIL, "password": settings.SHIPROCKET_PASSWORD}
+#             )
+#             shiprocket_token = auth_res.json().get("token")
+#             headers = {"Authorization": f"Bearer {shiprocket_token}"}
+#             logger.debug("[CreatePaymentView] Shiprocket token successfully obtained.")
+#         except Exception as e:
+#             logger.error(f"[CreatePaymentView] Shiprocket auth failed: {e}")
+#             return JsonResponse({'error': 'Shipping service error'}, status=500)
 
-        # Add shipping cost
-        shipping_cost = Decimal('120')
-        total = discounted_total + shipping_cost
+#         shipping_cost = Decimal("0.00")
+#         shipping_breakdown = []
 
-        # Ensure the amount is in paisa (smallest unit of INR)
-        amount_in_paisa = int(total * 100)
+#         for item in cart_items:
+#             product = item.product
+#             quantity = item.quantity
 
-        # Create Razorpay order
-        razorpay_order = client.order.create({
-            "amount": amount_in_paisa,
+#             if not all([product.weight, product.length, product.breadth, product.height]):
+#                 fallback_cost = Decimal("120.00") * quantity
+#                 shipping_cost += fallback_cost
+#                 logger.warning(f"[CreatePaymentView] Missing dimensions for product {product.uid}, fallback ₹{fallback_cost}")
+#                 shipping_breakdown.append({
+#                     "product": product.product_name,
+#                     "product_id": str(product.uid),
+#                     "provider": "Fallback",
+#                     "cost": float(fallback_cost),
+#                     "reason": "Missing dimensions"
+#                 })
+#                 continue
+
+#             params = {
+#                 "pickup_postcode": product.pincode,
+#                 "delivery_postcode": delivery_pincode,
+#                 "weight": product.weight,
+#                 "length": product.length,
+#                 "breadth": product.breadth,
+#                 "height": product.height,
+#                 "cod": 0
+#             }
+
+#             url = "https://apiv2.shiprocket.in/v1/external/courier/serviceability/"
+
+#             try:
+#                 response = requests.get(url, params=params, headers=headers, timeout=10)
+#                 data = response.json()
+
+#                 if data.get("data") and data["data"].get("available_courier_companies"):
+#                     cheapest = min(data["data"]["available_courier_companies"], key=lambda c: c["rate"])
+#                     rate = Decimal(str(cheapest["rate"])).quantize(Decimal('0.01'))
+#                     total_rate = rate * quantity
+#                     shipping_cost += total_rate
+
+#                     logger.info(f"[CreatePaymentView] Courier for {product.product_name} (x{quantity}): {cheapest['courier_name']} at ₹{total_rate}")
+
+#                     shipping_breakdown.append({
+#                         "product": product.product_name,
+#                         "product_id": str(product.uid),
+#                         "provider": cheapest['courier_name'],
+#                         "cost": float(total_rate),
+#                         "estimated_delivery_days": cheapest.get("estimated_delivery_days"),
+#                     })
+#                 else:
+#                     fallback = Decimal("120.00") * quantity
+#                     shipping_cost += fallback
+#                     logger.warning(f"[CreatePaymentView] No courier found for product {product.uid}. Fallback ₹{fallback}")
+#                     shipping_breakdown.append({
+#                         "product": product.product_name,
+#                         "product_id": str(product.uid),
+#                         "provider": "Fallback",
+#                         "cost": float(fallback),
+#                         "reason": "No courier found"
+#                     })
+
+#             except requests.exceptions.Timeout:
+#                 fallback = Decimal("120.00") * quantity
+#                 shipping_cost += fallback
+#                 logger.warning(f"[CreatePaymentView] Timeout while fetching rate for {product.uid}. Fallback ₹{fallback}")
+#                 shipping_breakdown.append({
+#                     "product": product.product_name,
+#                     "product_id": str(product.uid),
+#                     "provider": "Fallback",
+#                     "cost": float(fallback),
+#                     "reason": "Request timeout"
+#                 })
+#             except Exception as e:
+#                 fallback = Decimal("120.00") * quantity
+#                 shipping_cost += fallback
+#                 logger.error(f"[CreatePaymentView] Error for product {product.uid}: {e}. Fallback ₹{fallback}")
+#                 shipping_breakdown.append({
+#                     "product": product.product_name,
+#                     "product_id": str(product.uid),
+#                     "provider": "Fallback",
+#                     "cost": float(fallback),
+#                     "reason": "Rate fetch error"
+#                 })
+
+#         final_total = (discounted_total + shipping_cost).quantize(Decimal('0.01'))
+#         amount_paisa = int((final_total * 100).quantize(Decimal('1')))
+#         logger.debug(f"[CreatePaymentView] Final total ₹{final_total}, amount in paisa: {amount_paisa}")
+
+#         client = Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+#         payment = client.order.create({
+#             "amount": amount_paisa,
+#             "currency": "INR",
+#             "payment_capture": 1
+#         })
+#         logger.debug(f"[CreatePaymentView] Razorpay order created: {payment['id']}")
+
+#         Order.objects.create(
+#             user=user,
+#             name=user.get_full_name(),
+#             email=user.email,
+#             phone=profile.phone or "",
+#             address=', '.join(filter(None, [
+#                 profile.house_number,
+#                 profile.street,
+#                 profile.locality,
+#                 profile.city,
+#                 profile.state,
+#                 str(profile.coustmer_pincode)
+#             ])),
+#             payment_method="Prepaid",
+#             razorpay_order_id=payment["id"],
+#             total_amount=final_total,
+#             shipping_cost=shipping_cost,
+#             is_paid=False,
+#         )
+#         logger.info(f"[CreatePaymentView] Temporary Order created for Razorpay order {payment['id']}")
+
+#         return JsonResponse({
+#             "order_id": payment["id"],
+#             "amount": amount_paisa,
+#             "currency": "INR",
+#             "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+#             "shipping_cost": float(shipping_cost),
+#             "total_shipping": float(shipping_cost),
+#             "shipping_breakdown": shipping_breakdown,
+#             "subtotal": float(subtotal),
+#             "discount_amount": float(discount),
+#             "total": float(final_total),
+#             "user_name": user.get_full_name(),
+#             "user_email": user.email,
+#             "user_contact": profile.phone,
+#         })
+class CreatePaymentView(View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        profile = get_object_or_404(ProFile, user=user)
+        delivery_pincode = profile.coustmer_pincode
+
+        logger.debug(f"[CreatePaymentView] Checkout POST received | User: {user.email}")
+
+        try:
+            cart = SavedCart.objects.get(user=user)
+            cart_items = SavedCartItem.objects.filter(cart=cart)
+        except SavedCart.DoesNotExist:
+            logger.warning(f"[CreatePaymentView] No cart found for user {user.id}")
+            return JsonResponse({'error': 'Cart is empty'}, status=400)
+
+        subtotal = sum(Decimal(item.get_total_price()) for item in cart_items).quantize(Decimal('0.01'))
+        logger.debug(f"[CreatePaymentView] Subtotal: ₹{subtotal}")
+
+        discount = Decimal(str(request.session.get('pending_discount_amount', 0))).quantize(Decimal('0.01'))
+        discounted_total = (subtotal - discount).quantize(Decimal('0.01'))
+        logger.debug(f"[CreatePaymentView] Discount: ₹{discount} | Discounted Total: ₹{discounted_total}")
+
+        try:
+            auth_res = requests.post(
+                "https://sr-auth.shiprocket.in/v1/external/auth/login",
+                json={"email": settings.SHIPROCKET_EMAIL, "password": settings.SHIPROCKET_PASSWORD}
+            )
+            shiprocket_token = auth_res.json().get("token")
+            headers = {"Authorization": f"Bearer {shiprocket_token}"}
+            logger.debug("[CreatePaymentView] Shiprocket token successfully obtained.")
+        except Exception as e:
+            logger.error(f"[CreatePaymentView] Shiprocket auth failed: {e}")
+            return JsonResponse({'error': 'Shipping service error'}, status=500)
+
+        shipping_cost = Decimal("0.00")
+        shipping_breakdown = []
+        sellers_set = set()
+
+        for item in cart_items:
+            product = item.product
+            quantity = item.quantity
+            sellers_set.add(product.user_id)
+
+            if not all([product.weight, product.length, product.breadth, product.height]):
+                fallback_cost = Decimal("120.00") * quantity
+                shipping_cost += fallback_cost
+                logger.warning(f"[CreatePaymentView] Missing dimensions for product {product.uid}, fallback ₹{fallback_cost}")
+                shipping_breakdown.append({
+                    "product": product.product_name,
+                    "product_id": str(product.uid),
+                    "provider": "Fallback",
+                    "cost": float(fallback_cost),
+                    "reason": "Missing dimensions"
+                })
+                continue
+
+            params = {
+                "pickup_postcode": product.pincode,
+                "delivery_postcode": delivery_pincode,
+                "weight": product.weight,
+                "length": product.length,
+                "breadth": product.breadth,
+                "height": product.height,
+                "cod": 0
+            }
+
+            url = "https://apiv2.shiprocket.in/v1/external/courier/serviceability/"
+
+            try:
+                response = requests.get(url, params=params, headers=headers, timeout=10)
+                data = response.json()
+
+                if data.get("data") and data["data"].get("available_courier_companies"):
+                    cheapest = min(data["data"]["available_courier_companies"], key=lambda c: c["rate"])
+                    rate = Decimal(str(cheapest["rate"])).quantize(Decimal('0.01'))
+                    total_rate = rate * quantity
+                    shipping_cost += total_rate
+
+                    logger.info(f"[CreatePaymentView] Courier for {product.product_name} (x{quantity}): {cheapest['courier_name']} at ₹{total_rate}")
+
+                    shipping_breakdown.append({
+                        "product": product.product_name,
+                        "product_id": str(product.uid),
+                        "provider": cheapest['courier_name'],
+                        "cost": float(total_rate),
+                        "estimated_delivery_days": cheapest.get("estimated_delivery_days"),
+                    })
+                else:
+                    fallback = Decimal("120.00") * quantity
+                    shipping_cost += fallback
+                    logger.warning(f"[CreatePaymentView] No courier found for product {product.uid}. Fallback ₹{fallback}")
+                    shipping_breakdown.append({
+                        "product": product.product_name,
+                        "product_id": str(product.uid),
+                        "provider": "Fallback",
+                        "cost": float(fallback),
+                        "reason": "No courier found"
+                    })
+
+            except requests.exceptions.Timeout:
+                fallback = Decimal("120.00") * quantity
+                shipping_cost += fallback
+                logger.warning(f"[CreatePaymentView] Timeout while fetching rate for {product.uid}. Fallback ₹{fallback}")
+                shipping_breakdown.append({
+                    "product": product.product_name,
+                    "product_id": str(product.uid),
+                    "provider": "Fallback",
+                    "cost": float(fallback),
+                    "reason": "Request timeout"
+                })
+            except Exception as e:
+                fallback = Decimal("120.00") * quantity
+                shipping_cost += fallback
+                logger.error(f"[CreatePaymentView] Error for product {product.uid}: {e}. Fallback ₹{fallback}")
+                shipping_breakdown.append({
+                    "product": product.product_name,
+                    "product_id": str(product.uid),
+                    "provider": "Fallback",
+                    "cost": float(fallback),
+                    "reason": "Rate fetch error"
+                })
+
+        platform_fee = Decimal("10.00") * len(sellers_set)
+        logger.debug(f"[CreatePaymentView] Platform Fee: ₹{platform_fee}")
+
+        final_total = (discounted_total + shipping_cost + platform_fee).quantize(Decimal('0.01'))
+        amount_paisa = int((final_total * 100).quantize(Decimal('1')))
+        logger.debug(f"[CreatePaymentView] Final total ₹{final_total}, amount in paisa: {amount_paisa}")
+
+        client = Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        payment = client.order.create({
+            "amount": amount_paisa,
             "currency": "INR",
             "payment_capture": 1
         })
+        logger.debug(f"[CreatePaymentView] Razorpay order created: {payment['id']}")
 
-        # Save order to database
-        order = Order.objects.create(
-            user=request.user,
-            name=request.user.profile.name or request.user.get_full_name(),
-            email=request.user.email,
-            phone=request.user.profile.phone or "",
-            address=request.user.profile.address or "Not Provided",
-            payment_method="Razorpay",
-            transaction_id=razorpay_order["id"],
-            total_amount=float(total),
-            razorpay_order_id=razorpay_order["id"]
+        Order.objects.create(
+            user=user,
+            name=user.get_full_name(),
+            email=user.email,
+            phone=profile.phone or "",
+            address=', '.join(filter(None, [
+                profile.house_number,
+                profile.street,
+                profile.locality,
+                profile.city,
+                profile.state,
+                str(profile.coustmer_pincode)
+            ])),
+            payment_method="Prepaid",
+            razorpay_order_id=payment["id"],
+            total_amount=final_total,
+            shipping_cost=shipping_cost,
+            is_paid=False,
         )
+        logger.info(f"[CreatePaymentView] Temporary Order created for Razorpay order {payment['id']}")
 
         return JsonResponse({
-            "order_id": razorpay_order["id"],
+            "order_id": payment["id"],
+            "amount": amount_paisa,
+            "currency": "INR",
             "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-            "amount": amount_in_paisa,
-            "product_name": "Cart Purchase + Shipping",
-            "user_name": order.name,
-            "user_email": order.email,
-            "user_contact": getattr(request.user.profile, 'phone', ''),
-            "callback_url": "/payment-callback/",
             "shipping_cost": float(shipping_cost),
+            "total_shipping": float(shipping_cost),
+            "shipping_breakdown": shipping_breakdown,
             "subtotal": float(subtotal),
-            "total": float(total),
-            "discount_amount": float(discount_amount)
+            "discount_amount": float(discount),
+            "platform_fee": float(platform_fee),
+            "total": float(final_total),
+            "user_name": user.get_full_name(),
+            "user_email": user.email,
+            "user_contact": profile.phone,
         })
-
-from django.conf import settings
 
 from_email = settings.EMAIL_HOST_USER  # for sending from your Gmail
 
-from accounts.views import send_confirmation_emails
+from accounts.tasks import send_confirmation_emails_task  
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -883,60 +1421,134 @@ from decimal import Decimal
 import json
 from django.http import JsonResponse
 # from .models import PromoCode, SavedCart, SavedCartItem
+from accounts.views import calculate_shipping_rate
+from decimal import Decimal
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
+@csrf_exempt
 def apply_promo_code(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            promo_code = data.get('promo_code', '').strip()
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON request'}, status=400)
+    if request.method != 'POST':
+        logger.warning("[apply_promo_code] Invalid request method.")
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        promo_code = data.get('promo_code', '').strip()
+        if not promo_code:
+            logger.warning("[apply_promo_code] Promo code missing in request.")
+            return JsonResponse({'error': 'Promo code is required.'}, status=400)
+    except json.JSONDecodeError as e:
+        logger.error(f"[apply_promo_code] JSON decode error: {e}")
+        return JsonResponse({'error': 'Invalid JSON request'}, status=400)
+
+    try:
+        promo = PromoCode.objects.get(code__iexact=promo_code)
+        logger.debug(f"[apply_promo_code] Promo code '{promo_code}' found.")
+    except PromoCode.DoesNotExist:
+        logger.warning(f"[apply_promo_code] Promo code '{promo_code}' not found.")
+        return JsonResponse({'error': 'Invalid promo code.'}, status=400)
+
+    if promo.used_by.filter(id=request.user.id).exists():
+        logger.info(f"[apply_promo_code] User {request.user.id} already used promo code '{promo_code}'.")
+        return JsonResponse({'error': 'You have already used this promo code.'}, status=400)
+
+    if promo.is_used:
+        logger.info(f"[apply_promo_code] Promo code '{promo_code}' is marked as used.")
+        return JsonResponse({'error': 'This promo code has already been used.'}, status=400)
+
+    cart = SavedCart.objects.filter(user=request.user).first()
+    if not cart:
+        logger.warning(f"[apply_promo_code] Cart not found for user {request.user.id}.")
+        return JsonResponse({'error': 'Your cart is empty.'}, status=400)
+
+    cart_items = SavedCartItem.objects.filter(cart=cart)
+    if not cart_items.exists():
+        logger.warning(f"[apply_promo_code] Cart items not found for cart {cart.id}.")
+        return JsonResponse({'error': 'Your cart is empty.'}, status=400)
+
+    # Log each cart item
+    for item in cart_items:
+        logger.debug(f"[apply_promo_code] Item: {item.product.product_name}, Qty: {item.quantity}, Price: {item.get_total_price()}")
+
+    subtotal = sum(Decimal(str(item.get_total_price())) for item in cart_items)
+    logger.debug(f"[apply_promo_code] Subtotal before discount: ₹{subtotal}")
+
+    discount_amount = Decimal(str(promo.discount_percentage))
+    discount_amount = min(discount_amount, subtotal).quantize(Decimal('0.01'))
+    logger.debug(f"[apply_promo_code] Discount applied: ₹{discount_amount}")
+
+    # Shipping cost calculation (fixed: multiplied by quantity)
+    shipping_cost = Decimal('0.00')
+    profile = request.user.profile
+
+    for item in cart_items:
+        product = item.product
+        quantity = item.quantity
 
         try:
-            promo = PromoCode.objects.get(code=promo_code)
-        except PromoCode.DoesNotExist:
-            return JsonResponse({'error': 'Invalid promo code.'}, status=400)
+            result = calculate_shipping_rate(product, profile)
+            rate = Decimal(str(result.get('rate'))) if result.get('rate') else Decimal('120.00')
+            total_rate = rate * quantity
+            shipping_cost += total_rate
+            logger.debug(f"[apply_promo_code] Shipping rate for product {product.uid}: ₹{rate} × {quantity} = ₹{total_rate}")
+        except Exception as e:
+            fallback = Decimal('120.00') * quantity
+            logger.error(f"[apply_promo_code] Shipping rate fetch failed for product {product.uid}: {e}")
+            shipping_cost += fallback
 
-        if promo.used_by.filter(id=request.user.id).exists():
-            return JsonResponse({'error': 'You have already used this promo code.'}, status=400)
+    total = (subtotal - discount_amount + shipping_cost).quantize(Decimal('0.01'))
+    logger.debug(f"[apply_promo_code] Final total: ₹{total}")
 
-        if promo.is_used:
-            return JsonResponse({'error': 'This promo code has already been used globally.'}, status=400)
+    # Save to session
+    request.session['pending_promo_id'] = promo.id
+    request.session['pending_discount_amount'] = float(discount_amount)
+    logger.info(f"[apply_promo_code] Promo code '{promo_code}' applied successfully for user {request.user.id}.")
 
-        # Calculate cart subtotal
-        cart = SavedCart.objects.filter(user=request.user).first()
-        if not cart:
-            return JsonResponse({'error': 'Your cart is empty.'}, status=400)
+    discounted_subtotal = (subtotal - discount_amount).quantize(Decimal('0.01'))
 
-        cart_items = SavedCartItem.objects.filter(cart=cart)
-        subtotal = sum(Decimal(str(item.get_price())) for item in cart_items)  # Ensure it's Decimal
+    return JsonResponse({
+        'discount_amount': float(discount_amount),
+        'subtotal': float(discounted_subtotal),  # 👈 Updated to reflect discount
+        'shipping_cost': float(shipping_cost),
+        'total': float(total)
+    }, status=200)
 
-        # Apply flat discount (not percentage)
-        discount_amount = Decimal(str(promo.discount_percentage))  # Treat this as flat ₹ amount
 
-        # Ensure discount does not exceed subtotal
-        discount_amount = min(discount_amount, subtotal)
-        discount_amount = round(discount_amount, 2)
+# from accounts.views import get_shiprocket_token, create_shiprocket_order
 
-        # Calculate total with shipping
-        shipping_cost = Decimal('120')  # Ensure this is Decimal
-        total = round(subtotal - discount_amount + shipping_cost, 2)
 
-        # Store in session as JSON-safe types
-        request.session['pending_promo_id'] = promo.id
-        request.session['pending_discount_amount'] = float(discount_amount)
 
-        return JsonResponse({
-            'discount_amount': float(discount_amount),
-            'subtotal': float(subtotal),
-            'total': float(total)
-        }, status=200)
+# logger = logging.getLogger(__name__)
 
-    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+# @method_decorator(csrf_exempt, name='dispatch')
+from django.views import View
+from accounts.views import split_and_create_orders
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.conf import settings
+from accounts.models import Order, SavedCart, OrderItem, PromoCode  # Adjust to your app name
+from accounts.views import get_shiprocket_token,  create_shiprocket_order
+from accounts.tasks import send_confirmation_emails_task  
+import razorpay
+import logging
+from django.views import View
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from decimal import Decimal
+import json
+import logging
+import razorpay
+from accounts.models import SubOrder
 
 logger = logging.getLogger(__name__)
-
+client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 @method_decorator(csrf_exempt, name='dispatch')
+
+
+
 
 class PaymentCallbackView(View):
     def post(self, request):
@@ -948,47 +1560,77 @@ class PaymentCallbackView(View):
         try:
             order = get_object_or_404(Order, razorpay_order_id=order_id)
 
-            client = razorpay.Client(auth=("rzp_test_4t8nCdN7uI0xEP", "6PWff6o8IE8dtouN2DMfBquc"))
+            # ✅ Verify Razorpay payment signature
+            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
             client.utility.verify_payment_signature({
                 "razorpay_order_id": order_id,
                 "razorpay_payment_id": payment_id,
                 "razorpay_signature": signature
             })
 
+            # ✅ Update order with payment details
             order.razorpay_payment_id = payment_id
             order.razorpay_signature = signature
+            order.transaction_id = payment_id
+            order.payment_method = "Prepaid"  # <-- Add this line
             order.is_paid = True
+            order.status = 'Pending'
             order.save()
 
-            # Apply promo if present in session
+
+            # ✅ Apply promo code if available
             if 'pending_promo_id' in request.session:
-                promo_id = request.session['pending_promo_id']
+                promo_id = request.session.pop('pending_promo_id')
+                discount = request.session.pop('pending_discount_amount', None)
                 promo = PromoCode.objects.get(id=promo_id)
                 promo.is_used = True
                 promo.used_by.add(request.user)
                 promo.save()
-                del request.session['pending_promo_id']
-                del request.session['pending_discount_amount']
 
-            saved_cart = SavedCart.objects.filter(user=order.user).first()
-            if saved_cart:
-                cart_items = saved_cart.get_items()
-                for item in cart_items:
-                    product = item.product
-                    OrderItem.objects.create(
-                        order=order,
-                        product=product,
-                        quantity=item.quantity,
-                        price=item.get_price()
-                    )
-                saved_cart.items.all().delete()
+            # ✅ Retrieve cart
+            cart = SavedCart.objects.filter(user=order.user).first()
+            if not cart:
+                return JsonResponse({"status": "failed", "reason": "Cart not found"})
 
-            send_confirmation_emails(order)
+            cart_items = cart.items.select_related('product')
+
+            # ✅ Parse shipping breakdown from frontend (with fallback)
+            try:
+                raw_breakdown = request.POST.get("shipping_breakdown", "[]")
+                shipping_breakdown = json.loads(raw_breakdown)
+            except json.JSONDecodeError:
+                shipping_breakdown = []
+
+            # ✅ Patch product.id → product.uid
+            for item in shipping_breakdown:
+                if 'product_id' in item:
+                    item['product_id'] = str(item['product_id'])
+
+            # ✅ Get Shiprocket token
+            token = get_shiprocket_token()
+
+            # ✅ Split and create orders per seller
+            created_orders = split_and_create_orders(
+                user=request.user,
+                cart_items=cart_items,
+                base_order=order,
+                shipping_breakdown=shipping_breakdown,
+                shiprocket_token=token
+            )
+
+            # ✅ Clear cart
+            cart.items.all().delete()
+
+            # ✅ Send confirmation emails
+            for o in created_orders:
+                if isinstance(o, SubOrder):
+                    send_confirmation_emails_task.delay(o.id) 
+
             return JsonResponse({"status": "success"})
-        
-        except Exception as e:
-            return JsonResponse({"status": "failed", "reason": str(e)})
 
+        except Exception as e:
+            logger.error(f"[ERROR] PaymentCallbackView failed: {e}")
+            return JsonResponse({"status": "failed", "reason": str(e)})
 
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
@@ -1132,143 +1774,126 @@ class CreateSellerPaymentView(LoginRequiredMixin, View):
         })
 
 
-import razorpay
-from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.views import View
-from django.utils.decorators import method_decorator
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-# client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-
-import json
-import uuid
-import base64
-import logging
-from decimal import Decimal
-from django.conf import settings
-from django.http import JsonResponse
-from django.views import View
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.core.files.base import ContentFile
-from django.utils.text import slugify
-import razorpay
-
-# from .models import Category, Product, ColorVariant, SizeVariant, ProductImage
-
-# Initialize Razorpay client
-import base64
-import json
-import logging
-import uuid
-
-from django.conf import settings
-from django.core.files.base import ContentFile
-from django.http import JsonResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views import View
-from django.utils.text import slugify
-import json
-import logging
-import base64
-from django.views import View
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.conf import settings
-from django.core.files.base import ContentFile
-from django.utils.text import slugify
-import razorpay
-import razorpay
-import base64
-import imghdr
-from django.core.files.base import ContentFile
 # from .models import Product, Category, ColorVariant, SizeVariant, ProductImage
 # from .models import Product, ProductImage, ColorVariant, SizeVariant, Category
 
 logger = logging.getLogger(__name__)
 
+from django.views import View
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
+# from .models import Product, Category, ProductImage, ProFile
+from django.core.files.base import ContentFile
+import uuid
+import razorpay
+from .models import SellerPayment
 @method_decorator(csrf_exempt, name='dispatch')
-class SellerPaymentCallbackView(View):
-
+class SellerPaymentCallbackView(LoginRequiredMixin, View):
     def post(self, request):
+        user = request.user
+        profile = user.profile
+
+        # Step 1: Verify Razorpay signature
+        razorpay_order_id = request.POST.get("razorpay_order_id")
+        razorpay_payment_id = request.POST.get("razorpay_payment_id")
+        razorpay_signature = request.POST.get("razorpay_signature")
+
+        client = razorpay.Client(auth=("rzp_test_4t8nCdN7uI0xEP", "6PWff6o8IE8dtouN2DMfBquc"))
+
         try:
-            razorpay_order_id = request.POST.get('razorpay_order_id')
-            razorpay_payment_id = request.POST.get('razorpay_payment_id')
-            razorpay_signature = request.POST.get('razorpay_signature')
+            client.utility.verify_payment_signature({
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature
+            })
+        except razorpay.errors.SignatureVerificationError:
+            return JsonResponse({"status": "failure", "error": "Payment verification failed."}, status=400)
 
-            if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
-                logger.warning("Missing required Razorpay fields.")
-                return JsonResponse({'status': 'failure', 'message': 'Missing payment verification fields.'}, status=400)
+        # Step 2: Mark user as seller (if not already)
+        if not profile.is_seller:
+            profile.is_seller = True
+            profile.save()
 
-            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-            try:
-                client.utility.verify_payment_signature({
-                    'razorpay_order_id': razorpay_order_id,
-                    'razorpay_payment_id': razorpay_payment_id,
-                    'razorpay_signature': razorpay_signature
-                })
-            except razorpay.errors.SignatureVerificationError as e:
-                logger.error("Signature verification failed: %s", e)
-                return JsonResponse({'status': 'failure', 'message': 'Signature verification failed.'}, status=400)
+        # Step 3: Log the verified payment
+        SellerPayment.objects.create(
+            user=user,
+            razorpay_order_id=razorpay_order_id,
+            razorpay_payment_id=razorpay_payment_id,
+            amount=Decimal('3.00'),
+            status='paid'
+        )
 
-            # User must be authenticated
-            if not request.user.is_authenticated:
-                return JsonResponse({'status': 'failure', 'message': 'User not authenticated.'}, status=403)
+        # Step 4: Create Product ONLY after verified payment
+        product_name = request.POST.get("product_name")
+        description = request.POST.get("description")
+        base_price = request.POST.get("base_price")
+        category_id = request.POST.get("category_id")
 
-            category_id = request.POST.get("category_id")
-            try:
-                category = Category.objects.get(id=category_id)
-            except Category.DoesNotExist:
-                return JsonResponse({'status': 'failure', 'message': 'Invalid category.'}, status=400)
+        weight = request.POST.get("weight")
+        length = request.POST.get("length")
+        breadth = request.POST.get("breadth")
+        height = request.POST.get("height")
+        pincode = request.POST.get("pincode")
 
-            product = Product.objects.create(
-                user=request.user,
-                category=category,
-                product_name=request.POST.get("product_name"),
-                product_description=request.POST.get("description"),
-                price=request.POST.get("base_price"),
-                seller_email=request.user.email,
-                seller_name=request.user.first_name,
-                seller_phone=request.user.profile.phone,
-                weight = request.POST.get('weight'),
-                length = request.POST.get('length'),
-                breadth = request.POST.get('breadth'),
-                height = request.POST.get('height'),
-                pincode = request.POST.get('pincode'),
-                
-            )
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            return JsonResponse({"status": "failure", "error": "Invalid category"})
 
-            # Save color variants
-            colors = json.loads(request.POST.get("colors", "[]"))
+        product = Product.objects.create(
+            product_name=product_name,
+            product_description=description,
+            category=category,
+            price=base_price,
+            slug=slugify(product_name),
+            user=user,
+            weight=weight,
+            length=length,
+            breadth=breadth,
+            height=height,
+            pincode=pincode
+        )
+
+        # Save main image
+        main_image = request.FILES.get("main_image")
+        if main_image:
+            ProductImage.objects.create(product=product, image=main_image)
+
+        # Save additional images
+        for i in range(3):
+            image = request.FILES.get(f"additional_image_{i}")
+            if image:
+                ProductImage.objects.create(product=product, image=image)
+
+        # Handle colors
+        colors_json = request.POST.get("colors")
+        if colors_json:
+            import json
+            colors = json.loads(colors_json)
             for color in colors:
-                variant, _ = ColorVariant.objects.get_or_create(color_name=color["name"], price=color["price"])
-                product.color_variants.add(variant)
+                name = color['name']
+                price = color['price']
+                color_obj, _ = ColorVariant.objects.get_or_create(color_name=name, defaults={'price': price})
+                product.color_variants.add(color_obj)
 
-            # Save size variants
-            sizes = json.loads(request.POST.get("sizes", "[]"))
+        # Handle sizes
+        sizes_json = request.POST.get("sizes")
+        if sizes_json:
+            sizes = json.loads(sizes_json)
             for size in sizes:
-                variant, _ = SizeVariant.objects.get_or_create(size_name=size["name"], price=size["price"])
-                product.size_variants.add(variant)
+                name = size['name']
+                price = size['price']
+                size_obj, _ = SizeVariant.objects.get_or_create(size_name=name, defaults={'price': price})
+                product.size_variants.add(size_obj)
 
-            # Save main image
-            if 'main_image' in request.FILES:
-                ProductImage.objects.create(product=product, image=request.FILES['main_image'], is_main=True)
+        return JsonResponse({
+    "status": "success",
+    "product_id": str(product.uid),
+    "redirect_url": "/sellerdashboard/"
+})
 
-            # Save additional images
-            for key in request.FILES:
-                if key.startswith("additional_image_"):
-                    ProductImage.objects.create(product=product, image=request.FILES[key], is_main=False)
-
-            return JsonResponse({"status": "success"})
-
-        except Exception as e:
-            logger.exception("Error processing product upload:")
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-        
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse

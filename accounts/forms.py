@@ -14,11 +14,11 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = ['name', 'email', 'address', 'payment_method']
 
-from django import forms
-from .models import SellerProfile
+# from django import forms
+# from .models import SellerProfile
 
-class KYCForm(forms.ModelForm):
-    class Meta:
-        model = SellerProfile
-        fields = ['phone', 'address', 'aadhar_number', 'pan_number']
+# class KYCForm(forms.ModelForm):
+#     class Meta:
+#         model = SellerProfile
+#         fields = ['phone', 'address', 'aadhar_number', 'pan_number']
 

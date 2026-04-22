@@ -220,6 +220,7 @@ SITE_ID = 2
 # settings.py
 LOGIN_URL = '/user_login'  # Redirect to this URL if the user is not logged in
 
+
 RAZORPAY_KEY_ID = "rzp_test_4t8nCdN7uI0xEP"
 RAZORPAY_KEY_SECRET = "6PWff6o8IE8dtouN2DMfBquc"
 
@@ -237,3 +238,26 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 
 SHIPROCKET_EMAIL="work.kavleen@gmail.com"
 SHIPROCKET_PASSWORD="x@9yRW1Qw4TF#p$P"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',  # or 'INFO' in production
+    },
+}
+
+# settings.py  ──────────────────────────────────────────────
+CELERY_BROKER_URL        = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND    = "redis://127.0.0.1:6379/1"
+
+CELERY_ACCEPT_CONTENT    = ["json"]
+CELERY_TASK_SERIALIZER   = "json"     # ← typo fixed
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE          = "Asia/Kolkata"

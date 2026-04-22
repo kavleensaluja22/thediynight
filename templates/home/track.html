@@ -46,7 +46,7 @@ body {
 .nav {
     display: flex;
     gap: 20px;
-    align-items: center;
+    {% comment %} align-items: center; {% endcomment %}
 }
 
 .nav-item {
@@ -572,8 +572,8 @@ body {
 /* Default styling for small screens (center the logo) */
 .logo {
   display: block;
-  text-align: center;
-  margin: 0 auto;
+  {% comment %} text-align: center; {% endcomment %}
+  {% comment %} margin: 0 auto; {% endcomment %}
   font-size: 2rem; /* Adjust the font size as needed */
 }
 
@@ -581,62 +581,125 @@ body {
 @media (min-width: 768px) {
   .logo {
     text-align: left;
-    margin: 0; /* Ensure no extra margin on the left */
   }
 }
-
-
+@media (max-width: 640px) {
+    .logo {
+      text-align: left !important;
+      margin-left: 0.7rem;
+    }
+  }
+  .logo {
+    display: block;
+    font-weight: bold;
+    font-size: 1.40rem;
+    color: #6daabd;
+    text-decoration: none;
+    text-align: left; /* Default for large screens */
+    margin-left: 0;   /* No left margin */
+  }
+  
+  /* On small screens - center the logo */
+  @media (max-width: 640px) {
+    .logo {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
 </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <a href="/" class="logo">@thediynight</a>
-            <nav class="nav">
-                <a href="/" class="nav-item">Shop</a>
-                {% comment %} <a href="track" class="nav-item">Track</a> {% endcomment %}
-                <a href="/user/" class="nav-item">
-                    {% if request.user.is_authenticated %}
-                        {{ request.user.profile.name|default:request.user.username }}
-                    {% else %}
-                        User
-                    {% endif %}
-                </a>            
-                <div class="cart-icon">
-                    <button class="nav-item" id="cart-btn">Cart</button>
-                    <span class="cart-count" id="cart-count">{{ cart_count }}</span>
-                </div>
-                
-            </nav>
+            <a href="/" class="logo" style="
+            display: block;
+            font-weight: bold;
+            font-size: 1.40rem;
+            color: #6daabd;
+            text-decoration: none;">
+            @thediynight
+          </a>
+          
+          <nav class="nav">
+            <a href="/" class="nav-item">Shop</a>
+            <a href="/track/" class="nav-item">Track</a>
+            <a href="/user/" class="nav-item">
+                {% if request.user.is_authenticated %}
+                    {{ request.user.profile.name|default:request.user.username }}
+                {% else %}
+                    User
+                {% endif %}
+            </a>
+            <div class="cart-icon">
+                <button class="nav-item" id="cart-btn">Cart</button>
+                <span class="cart-count" id="cart-count">{{ cart_count }}</span>
+            </div>
+        </nav>
         </header>
+    
         <main class="main-content">
-            <div class="slogan">Crafted with Care, Shaping Stories</div>
-            <section class="track-section">
-                <h2 class="track-title">Track Your Order</h2>
-                <form class="track-form" id="track-form">
-                    <input type="text" class="track-input" placeholder="Enter your order number" required>
-                    <button type="submit" class="track-button">Track</button>
-                </form>
-                <div class="track-result" id="track-result">
-                    <p class="track-status">Order Status: <span id="order-status"></span></p>
-                    <div class="track-details" id="track-details"></div>
-                </div>
-            </section>
-            <section class="order-history-section">
-                <h2 class="order-history-title">Previous Order History</h2>
-                <ul class="order-history-list" id="order-history-list"></ul>
-            </section>
+          <div class="slogan">Crafted with Care, Shaping Stories</div>
+    
+          <section class="track-section">
+            <h2 class="track-title">Track Your Order</h2>
+            <form class="track-form" id="track-form" method="get">
+              <input type="text" name="order_number" class="track-input" placeholder="Enter your order number" required>
+              <button type="submit" class="track-button">Track</button>
+            </form>
+          </section>
+    
+          {% if order %}
+            <div class="track-result">
+              <h3>Order Details</h3>
+              <p><strong>Order ID:</strong> {{ order.id }}</p>
+    
+              {% if order.awb_code %}
+                <p><strong>Courier:</strong> {{ order.selected_courier }}</p>
+                <p><strong>AWB Code:</strong> {{ order.awb_code }}</p>
+                <p><strong>Order Status:</strong> 
+                  <span id="order-status">
+                    {{ tracking_info.tracking_data.shipment_status|default:"Not yet updated" }}
+                  </span>
+                </p>
+                <a href="https://track.shiprocket.in/tracking/{{ order.awb_code }}" target="_blank">
+                  Track Your Shipment
+                </a>
+              {% else %}
+                <p>Order placed, but tracking is not yet available.</p>
+              {% endif %}
+            </div>
+          {% elif order_number %}
+            <p style="color: red;">Order not found. Please check your order number.</p>
+          {% endif %}
+    
+          {% if tracking_info and not tracking_info.error %}
+            <div class="tracking-info">
+              <h3>Live Tracking Info</h3>
+              <p><strong>Status:</strong> {{ tracking_info.tracking_data.shipment_status }}</p>
+              <p><strong>Current Location:</strong> {{ tracking_info.tracking_data.current_location }}</p>
+              <p><strong>Estimated Delivery:</strong> {{ tracking_info.tracking_data.edd }}</p>
+    
+              {% if tracking_info.tracking_data.track_status %}
+                <h4>Tracking History</h4>
+                <ul>
+                  {% for event in tracking_info.tracking_data.track_status %}
+                    <li>{{ event.date }} – {{ event.status }} – {{ event.location }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% elif tracking_info and tracking_info.error %}
+            <p style="color: red;">{{ tracking_info.error }}</p>
+          {% endif %}
         </main>
-    </div>
+      </div>
     
-  
-   <script>
-    
-    document.getElementById('cart-btn').addEventListener('click', () => {
-        window.location.href = "/cart/";
-    });
-
-</script>
+      <script>
+        document.getElementById('cart-btn').addEventListener('click', () => {
+          window.location.href = "/cart/";
+        });
+      </script>
 
 
     

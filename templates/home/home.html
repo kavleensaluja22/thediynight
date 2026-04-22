@@ -284,11 +284,6 @@
     color: #f5c518;  /* gold color for stars */
 }
 
-{% comment %} .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
-} {% endcomment %}
 
 /* For small and medium screens: force 2 columns */
 @media (max-width: 768px) {
@@ -310,7 +305,36 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
- 
+@media (min-width: 768px) {
+    .logo {
+      text-align: left;
+    }
+  }
+  @media (max-width: 640px) {
+      .logo {
+        text-align: left !important;
+        margin-left: 0.7rem;
+      }
+    }
+  
+    .logo {
+        display: block;
+        font-weight: bold;
+        font-size: 1.40rem;
+        color: #6daabd;
+        text-decoration: none;
+        text-align: left; /* Default for large screens */
+        margin-left: 0;   /* No left margin */
+      }
+      
+      /* On small screens - center the logo */
+      @media (max-width: 640px) {
+        .logo {
+          text-align: center;
+          margin-left: auto;
+          margin-right: auto;
+        }
+      } 
     </style>
 </head>
 
@@ -326,7 +350,7 @@
     <div class="container">
         <header class="header">
           <div class="logo-container">
-  <a href="/" class="logo">@thediynight</a>
+            <a href="/" class="logo">@thediynight</a>
 </div>
 
  <form method="GET" action="{% url 'search_products' %}" class="search-form">
@@ -337,7 +361,7 @@
 
             <nav class="nav">
                 <a href="/" class="nav-item">Shop</a>
-                {% comment %} <a href="track" class="nav-item">Track</a> {% endcomment %}
+                <a href="/track/" class="nav-item">Track</a>
                 <a href="/user/" class="nav-item">
                     {% if request.user.is_authenticated %}
                         {{ request.user.profile.name|default:request.user.username }}
@@ -378,7 +402,8 @@
                     <div class="product-image">
                         <a href="{% url 'prodd' product.slug %}">
                             {% if product.product_images.all %}
-                            <img src="{{ product.product_images.first.image.url }}" alt="{{ product.product_name }}">
+                            <img src="{{ product.get_main_image_url }}" alt="{{ product.product_name }}">
+
                             {% else %}
                             <img src="/path/to/default/image.jpg" alt="Default Image">
                             {% endif %}
